@@ -71,3 +71,9 @@ Primary tool: **Claude Code** (interactive agent), used throughout. Notable sess
 ## 7. What I'd improve with more time
 
 _(to be filled in near the end)_
+
+## 8. Phase log
+
+**Phase 0 — Scaffold.**
+Added `date-fns` + `vue-i18n`; wired vue-i18n via a Quasar boot file (`src/boot/i18n.js`, Composition mode) with an `en-US` locale registry under `src/i18n/`. Built the central state layer: `useRegistration.js` exposes `provideRegistration()` (called once in `IndexPage`) and `useRegistration()` (injected by steps), with the full typed state shape documented via JSDoc. `IndexPage.vue` hosts a `QStepper` (4 steps, `header-nav` for free forward/backward navigation, Back/Continue/Submit). Four step components are stubbed and rendered. Verified with a clean production build and a dev-server boot (no runtime errors).
+- AI note: Claude scaffolded the i18n boot, composable, and stepper in one pass. I had it verify both `yarn build` and a real dev boot rather than trusting compile-only — runtime is where boot-file/provide-inject mistakes surface.
