@@ -13,7 +13,7 @@ const emit = defineEmits(['select'])
 <template>
   <button
     type="button"
-    class="flex flex-col text-left cursor-pointer rounded-xl q-pa-lg transition"
+    class="flex flex-col text-left cursor-pointer q-pa-lg transition rounded-[10px]"
     :class="selected
       ? 'border-2 border-brand-emphasis bg-surface-l0'
       : 'border-2 border-neutral-muted bg-surface-l1 hover:border-brand-muted'"
@@ -29,7 +29,7 @@ const emit = defineEmits(['select'])
 
     <ul class="flex flex-col gap-2">
       <li v-for="perk in ticket.perks" :key="perk" class="row items-center no-wrap">
-        <q-icon name="check_circle" size="18px" class="text-brand-emphasis" />
+        <q-icon name="check_circle" size="18px" class="text-success-emphasis" />
         <span class="q-ml-sm text-md text-neutral">{{ perk }}</span>
       </li>
     </ul>

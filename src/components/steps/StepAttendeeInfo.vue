@@ -30,7 +30,7 @@ function selectTicket(id) {
 
     <!-- Attendee information -->
     <div class="flex flex-col gap-6">
-      <h2 class="text-h2 font-bold text-neutral">{{ $t('attendee.sectionTitle') }}</h2>
+      <h2 class="text-h3 font-bold text-neutral">{{ $t('attendee.sectionTitle') }}</h2>
       <div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
         <LabeledInput
           v-model="state.attendee.fullName"

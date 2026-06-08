@@ -80,7 +80,7 @@ function onSubmit() {
           no-caps
           color="accent"
           :label="nextLabel"
-          class="q-px-lg q-py-sm rounded-lg text-md font-semibold"
+          class="q-px-lg q-py-sm rounded-[10px] text-md font-semibold"
           @click="goNext"
         />
         <q-btn
@@ -89,7 +89,7 @@ function onSubmit() {
           no-caps
           color="accent"
           :label="$t('nav.submit')"
-          class="q-px-lg q-py-sm rounded-lg text-md font-semibold"
+          class="q-px-lg q-py-sm rounded-[10px] text-md font-semibold"
           @click="onSubmit"
         />
       </div>
