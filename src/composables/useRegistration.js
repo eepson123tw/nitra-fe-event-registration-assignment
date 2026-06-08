@@ -18,6 +18,7 @@ import { reactive, provide, inject } from 'vue'
  * @property {string|null} ticketTypeId           One of the ticket type ids (general/vip/student).
  * @property {string[]} selectedSessionIds        Ids of chosen sessions.
  * @property {Record<string, AddonSelection>} addons  Add-on id -> selection.
+ * @property {boolean} validationAttempted        Flipped true once Step 4 runs the unified validation.
  *
  * @typedef {Object} RegistrationStore
  * @property {RegistrationState} state
@@ -43,6 +44,7 @@ function createState() {
     ticketTypeId: null,
     selectedSessionIds: [],
     addons: {},
+    validationAttempted: false,
   })
 }
 

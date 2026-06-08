@@ -55,14 +55,16 @@ function onSubmit() {
     <WizardStepper :steps="steps" :current="current" @navigate="goTo" />
 
     <!-- Step content -->
-    <main class="col-grow full-width q-mx-auto q-px-md q-py-xl" style="max-width: 1200px">
-      <component :is="currentComponent" />
+    <main class="col-grow full-width q-px-md">
+      <div class="q-mx-auto py-[40px]" style="max-width: 1200px">
+        <component :is="currentComponent" />
+      </div>
     </main>
 
     <!-- Footer navigation -->
-    <footer class="bg-surface-l0 border-t border-neutral-muted">
+    <footer class="bg-surface-l0 q-px-md" style="border-top: 1px solid var(--divider-default)">
       <div
-        class="row items-center q-mx-auto q-px-md q-py-md"
+        class="row items-center q-mx-auto q-py-md"
         :class="isFirstStep ? 'justify-end' : 'justify-between'"
         style="max-width: 1200px"
       >

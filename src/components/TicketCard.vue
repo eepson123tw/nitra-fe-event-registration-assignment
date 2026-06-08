@@ -13,32 +13,35 @@ const emit = defineEmits(['select'])
 <template>
   <button
     type="button"
-    class="flex flex-col text-left cursor-pointer q-pa-lg transition rounded-[10px]"
+    class="flex flex-col gap-3 text-left cursor-pointer p-[20px] transition rounded-[6px] border-2 border-solid "
     :class="selected
-      ? 'border-2 border-brand-emphasis bg-surface-l0'
-      : 'border-2 border-neutral-muted bg-surface-l1 hover:border-brand-muted'"
+      ? 'border-brand-emphasis bg-brand-subtle-rest'
+      : 'border-neutral-muted bg-surface-l1 hover:border-brand-muted'"
     :aria-pressed="selected"
     @click="emit('select', ticket.id)"
   >
-    <div class="row items-start justify-between full-width">
-      <span class="text-lg font-bold text-neutral">{{ ticket.name }}</span>
-      <span class="text-lg font-bold text-neutral">{{ formatCurrency(ticket.price, { cents: false }) }}</span>
+    <div class="row items-center justify-between full-width text-subtitle1 text-neutral">
+      <span>{{ ticket.name }}</span>
+      <span>{{ formatCurrency(ticket.price, { cents: false }) }}</span>
     </div>
 
-    <p class="q-mt-xs q-mb-md text-md text-neutral-muted">{{ ticket.description }}</p>
+    <p class="text-sm text-neutral-muted">{{ ticket.description }}</p>
 
-    <ul class="flex flex-col gap-2">
+    <ul class="flex flex-col gap-3 full-width q-pl-none q-my-none">
       <li v-for="perk in ticket.perks" :key="perk" class="row items-center no-wrap">
-        <q-icon name="check_circle" size="18px" class="text-success-emphasis" />
-        <span class="q-ml-sm text-md text-neutral">{{ perk }}</span>
+        <q-icon name="check_circle" size="14px" class="text-neutral" />
+        <span class="q-ml-sm text-sm text-neutral-muted">{{ perk }}</span>
       </li>
     </ul>
 
+    <!-- Always rendered to reserve its height, so selecting a card never
+         reflows the row; hidden until the card is the selected one. -->
     <span
-      v-if="selected"
-      class="row items-center self-start q-mt-md q-px-sm q-py-xs rounded-full bg-brand-bold-rest text-inverse text-sm font-semibold"
+      class="row items-center self-start px-[8px] py-[3px] rounded-full bg-success-bold-rest text-inverse text-[11px] font-medium"
+      :class="{ invisible: !selected }"
+      :aria-hidden="!selected"
     >
-      <q-icon name="check" size="14px" class="q-mr-xs" />
+      <q-icon name="check" size="12px" class="q-mr-xs" />
       {{ $t('ticket.selected') }}
     </span>
   </button>

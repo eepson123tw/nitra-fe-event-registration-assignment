@@ -34,6 +34,7 @@ export default {
       label: 'Shipping Address',
       optional: '(Optional)',
       placeholder: 'Enter your shipping address',
+      required: 'Shipping address is required for merchandise orders',
     },
   },
   common: {

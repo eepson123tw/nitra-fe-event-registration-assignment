@@ -21,8 +21,8 @@ function stateOf(index, current) {
 </script>
 
 <template>
-  <nav class="bg-surface-l0 border-b border-neutral-muted">
-    <ol class="row no-wrap items-center q-mx-auto q-px-md" style="max-width: 1200px; height: 88px">
+  <nav class="bg-surface-l0 q-px-md" style="border-bottom: 1px solid var(--divider-default)">
+    <ol class="row no-wrap items-center q-mx-auto q-py-lg" style="max-width: 1200px; margin-top: 0; margin-bottom: 0">
       <li
         v-for="(step, i) in steps"
         :key="step.key"
@@ -55,12 +55,11 @@ function stateOf(index, current) {
             {{ step.label }}
           </span>
         </button>
-        <!-- Connector -->
+        <!-- Connector: a flat 2px surface-L2 line (Figma uses one color for all) -->
         <span
           v-if="i < steps.length - 1"
-          class="col-grow q-mx-md"
-          style="height: 1px"
-          :class="i + 1 < current ? 'bg-brand-muted-rest' : 'bg-neutral-muted-rest'"
+          class="col-grow q-mx-md bg-surface-l2"
+          style="height: 2px; border-radius: 1px"
         />
       </li>
     </ol>

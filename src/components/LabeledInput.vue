@@ -4,26 +4,34 @@ const model = defineModel({ type: String, default: '' })
 
 defineProps({
   label: { type: String, required: true },
-  /** Muted suffix after the label, e.g. "(Optional)". */
+  /** Muted suffix after the label, e.g. "(Optional)". Hidden when `required`. */
   labelSuffix: { type: String, default: '' },
   placeholder: { type: String, default: '' },
   type: { type: String, default: 'text' },
+  /** Marks the field required: shows a red asterisk instead of the suffix. */
+  required: { type: Boolean, default: false },
+  /** Error message; when truthy the label, border and message turn danger. */
+  error: { type: String, default: '' },
 })
 </script>
 
 <template>
   <div class="flex flex-col gap-2">
-    <label class="text-md font-medium text-neutral">
+    <label class="text-md font-medium" :class="error ? 'text-danger' : 'text-neutral'">
       {{ label }}
-      <span v-if="labelSuffix" class="font-regular text-neutral-quiet">{{ labelSuffix }}</span>
+      <span v-if="required" class="text-danger">*</span>
+      <span v-else-if="labelSuffix" class="font-regular text-neutral-quiet">{{ labelSuffix }}</span>
     </label>
     <q-input
       v-model="model"
       :type="type"
       :placeholder="placeholder"
+      :error="!!error"
       outlined
       dense
       hide-bottom-space
+      no-error-icon
     />
+    <span v-if="error" class="text-sm text-danger">{{ error }}</span>
   </div>
 </template>
