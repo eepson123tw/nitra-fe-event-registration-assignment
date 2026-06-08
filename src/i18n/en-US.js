@@ -5,7 +5,12 @@ export default {
   },
   nav: {
     back: 'Back',
-    continue: 'Continue',
+    // Per-step "next" labels naming the destination step.
+    next: {
+      sessions: 'Next: Session Selection',
+      addons: 'Next: Add-ons',
+      review: 'Next: Review',
+    },
     submit: 'Submit Registration',
   },
   steps: {
@@ -13,6 +18,23 @@ export default {
     sessions: { label: 'Sessions' },
     addons: { label: 'Add-ons' },
     review: { label: 'Review & Submit' },
+  },
+  ticket: {
+    sectionTitle: 'Select Ticket Type',
+    selected: 'Selected',
+  },
+  attendee: {
+    sectionTitle: 'Attendee Information',
+    fullName: { label: 'Full Name', placeholder: 'Enter your full name' },
+    email: { label: 'Email', placeholder: 'Enter your email address' },
+    phone: { label: 'Phone', placeholder: 'Enter your phone number' },
+    company: { label: 'Company', placeholder: 'Enter your company name' },
+    jobTitle: { label: 'Job Title', placeholder: 'Enter your job title' },
+    shippingAddress: {
+      label: 'Shipping Address',
+      optional: '(Optional)',
+      placeholder: 'Enter your shipping address',
+    },
   },
   common: {
     comingSoon: 'Coming soon',

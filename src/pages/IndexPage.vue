@@ -1,85 +1,98 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { provideRegistration } from '../composables/useRegistration.js'
+import AppHeader from '../components/AppHeader.vue'
+import WizardStepper from '../components/WizardStepper.vue'
 import StepAttendeeInfo from '../components/steps/StepAttendeeInfo.vue'
 import StepSessionSelection from '../components/steps/StepSessionSelection.vue'
 import StepAddons from '../components/steps/StepAddons.vue'
 import StepReview from '../components/steps/StepReview.vue'
 
+const { t } = useI18n()
+
 // Create + provide the shared wizard state for all steps.
 provideRegistration()
 
-const STEP_COUNT = 4
-const step = ref(1)
+// Step registry: order drives the stepper, the rendered component, and the
+// "next" button label. `nextLabel` is null on the final step (shows submit).
+const stepDefs = [
+  { key: 'attendee', component: StepAttendeeInfo, nextKey: 'sessions' },
+  { key: 'sessions', component: StepSessionSelection, nextKey: 'addons' },
+  { key: 'addons', component: StepAddons, nextKey: 'review' },
+  { key: 'review', component: StepReview, nextKey: null },
+]
+const STEP_COUNT = stepDefs.length
 
-const isFirstStep = computed(() => step.value === 1)
-const isLastStep = computed(() => step.value === STEP_COUNT)
+const current = ref(1)
 
+const steps = computed(() =>
+  stepDefs.map((s) => ({ key: s.key, label: t(`steps.${s.key}.label`) })),
+)
+const currentDef = computed(() => stepDefs[current.value - 1])
+const currentComponent = computed(() => currentDef.value.component)
+const isFirstStep = computed(() => current.value === 1)
+const isLastStep = computed(() => current.value === STEP_COUNT)
+const nextLabel = computed(() => t(`nav.next.${currentDef.value.nextKey}`))
+
+function goTo(step) {
+  if (step >= 1 && step <= STEP_COUNT) current.value = step
+}
 function goNext() {
-  if (step.value < STEP_COUNT) step.value += 1
+  goTo(current.value + 1)
 }
-
 function goBack() {
-  if (step.value > 1) step.value -= 1
+  goTo(current.value - 1)
 }
-
 function onSubmit() {
   // Unified validation + submission handled in the Review phase.
 }
 </script>
 
 <template>
-  <q-layout view="hHh lpR fFf">
-    <q-page-container>
-      <q-page class="flex flex-center q-pa-md">
-        <q-stepper
-          v-model="step"
-          animated
+  <div class="flex flex-col" style="min-height: 100vh; background: var(--bg-surface-l0)">
+    <AppHeader />
+    <WizardStepper :steps="steps" :current="current" @navigate="goTo" />
+
+    <!-- Step content -->
+    <main class="col-grow full-width q-mx-auto q-px-md q-py-xl" style="max-width: 1200px">
+      <component :is="currentComponent" />
+    </main>
+
+    <!-- Footer navigation -->
+    <footer class="bg-surface-l0 border-t border-neutral-muted">
+      <div
+        class="row items-center q-mx-auto q-px-md q-py-md"
+        :class="isFirstStep ? 'justify-end' : 'justify-between'"
+        style="max-width: 1200px"
+      >
+        <q-btn
+          v-if="!isFirstStep"
           flat
-          header-nav
-          class="full-width"
-          style="max-width: 900px"
-        >
-          <q-step :name="1" :title="$t('steps.attendee.label')" icon="person" :done="step > 1">
-            <StepAttendeeInfo />
-          </q-step>
-
-          <q-step :name="2" :title="$t('steps.sessions.label')" icon="event" :done="step > 2">
-            <StepSessionSelection />
-          </q-step>
-
-          <q-step :name="3" :title="$t('steps.addons.label')" icon="add_shopping_cart" :done="step > 3">
-            <StepAddons />
-          </q-step>
-
-          <q-step :name="4" :title="$t('steps.review.label')" icon="fact_check">
-            <StepReview />
-          </q-step>
-
-          <template #navigation>
-            <q-stepper-navigation class="row justify-between">
-              <q-btn
-                flat
-                :label="$t('nav.back')"
-                :disable="isFirstStep"
-                @click="goBack"
-              />
-              <q-btn
-                v-if="!isLastStep"
-                color="primary"
-                :label="$t('nav.continue')"
-                @click="goNext"
-              />
-              <q-btn
-                v-else
-                color="primary"
-                :label="$t('nav.submit')"
-                @click="onSubmit"
-              />
-            </q-stepper-navigation>
-          </template>
-        </q-stepper>
-      </q-page>
-    </q-page-container>
-  </q-layout>
+          no-caps
+          :label="$t('nav.back')"
+          class="text-md font-medium text-neutral"
+          @click="goBack"
+        />
+        <q-btn
+          v-if="!isLastStep"
+          unelevated
+          no-caps
+          color="accent"
+          :label="nextLabel"
+          class="q-px-lg q-py-sm rounded-lg text-md font-semibold"
+          @click="goNext"
+        />
+        <q-btn
+          v-else
+          unelevated
+          no-caps
+          color="accent"
+          :label="$t('nav.submit')"
+          class="q-px-lg q-py-sm rounded-lg text-md font-semibold"
+          @click="onSubmit"
+        />
+      </div>
+    </footer>
+  </div>
 </template>
