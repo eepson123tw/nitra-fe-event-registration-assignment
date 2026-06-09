@@ -117,13 +117,17 @@ function restart() {
     </div>
 
     <!-- Confirmation screen: centred in the area left below the header -->
-    <SuccessScreen v-if="submitted" :code="confirmationCode" @restart="restart" />
+    <Transition name="success">
+      <SuccessScreen v-if="submitted" :code="confirmationCode" @restart="restart" />
+    </Transition>
 
-    <template v-else>
-      <!-- Step content -->
+    <template v-if="!submitted">
+      <!-- Step content (animated on step change) -->
       <main class="col-grow full-width q-px-md">
         <div class="wizard-shell py-10">
-          <component :is="currentComponent" @navigate="goTo" />
+          <Transition name="step" mode="out-in">
+            <component :is="currentComponent" :key="current" @navigate="goTo" />
+          </Transition>
         </div>
       </main>
 
@@ -139,7 +143,7 @@ function restart() {
           no-caps
           :label="$t('nav.back')"
           padding="10px 16px"
-          class="bg-surface-l2 rounded-[10px] text-md font-medium text-neutral"
+          class="bg-surface-l2 rounded-[10px] text-md font-medium text-neutral transition-colors duration-150 hover:bg-surface-l3"
           @click="goBack"
         />
         <q-btn
@@ -149,7 +153,7 @@ function restart() {
           color="accent"
           :label="nextLabel"
           padding="10px 16px"
-          class="rounded-[10px] text-md font-semibold"
+          class="rounded-[10px] text-md font-semibold transition-all duration-150 hover:-translate-y-px hover:shadow-md active:translate-y-0"
           @click="goNext"
         />
         <q-btn
@@ -160,7 +164,7 @@ function restart() {
           :label="$t('nav.submit')"
           :disable="submitDisabled"
           padding="10px 16px"
-          class="rounded-[10px] text-md font-semibold"
+          class="rounded-[10px] text-md font-semibold transition-all duration-150 hover:-translate-y-px hover:shadow-md active:translate-y-0"
           @click="onSubmit"
         />
       </div>

@@ -40,7 +40,7 @@ const { state } = useRegistration()
       color="accent"
       :label="$t('success.backHome')"
       padding="10px 16px"
-      class="rounded-[10px] text-md font-semibold"
+      class="rounded-[10px] text-md font-semibold transition-all duration-150 hover:-translate-y-px hover:shadow-md active:translate-y-0"
       @click="$emit('restart')"
     />
   </section>

@@ -33,3 +33,58 @@ select {
   font-weight: 485;
   line-height: var(--line-height-lg);
 }
+
+// ── Motion ────────────────────────────────────────────────────────────────
+// Vue <Transition> classes used across the wizard. Kept global because the
+// transitioned element is often a child component's root (outside the host's
+// scoped styles). All subtle: ~180–250ms, ease, no bounce.
+
+// Step change (component :is, mode="out-in"): fade + small vertical slide.
+.step-enter-active,
+.step-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.step-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.step-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+// Validation error banner: fade + slide down on appear.
+.banner-enter-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.banner-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.banner-leave-active {
+  transition: opacity 0.15s ease;
+}
+.banner-leave-to {
+  opacity: 0;
+}
+
+// Success screen: gentle fade + scale-in.
+.success-enter-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.success-enter-from {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+// Accessibility: honour reduced-motion — neutralise all transitions/animations.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

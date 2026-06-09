@@ -90,20 +90,22 @@ const addonRows = computed(() => {
   <section class="flex flex-col gap-6">
     <!-- Validation summary sits above the heading (per the design), surfaced
          only after a submit attempt -->
-    <div
-      v-if="showErrors"
-      id="review-error-banner"
-      role="alert"
-      tabindex="-1"
-      class="flex flex-col gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-4 text-danger outline-none"
-    >
-      <p class="m-0 text-sm font-medium">{{ $t('review.banner.title') }}</p>
-      <ul class="m-0 flex list-none flex-col gap-2 p-0">
-        <li v-for="(item, i) in bannerIssues" :key="i" class="text-sm font-regular">
-          • {{ $t('review.banner.line', { step: item.step, message: item.text }) }}
-        </li>
-      </ul>
-    </div>
+    <Transition name="banner">
+      <div
+        v-if="showErrors"
+        id="review-error-banner"
+        role="alert"
+        tabindex="-1"
+        class="flex flex-col gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-4 text-danger outline-none"
+      >
+        <p class="m-0 text-sm font-medium">{{ $t('review.banner.title') }}</p>
+        <ul class="m-0 flex list-none flex-col gap-2 p-0">
+          <li v-for="(item, i) in bannerIssues" :key="i" class="text-sm font-regular">
+            • {{ $t('review.banner.line', { step: item.step, message: item.text }) }}
+          </li>
+        </ul>
+      </div>
+    </Transition>
 
     <h2 class="q-my-none text-h3 font-bold text-neutral">{{ $t('review.title') }}</h2>
 

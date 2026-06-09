@@ -32,10 +32,10 @@ function setLocale(code) {
       :key="l.code"
       type="button"
       :aria-pressed="locale === l.code"
-      class="cursor-pointer rounded-[6px] border-none px-3 py-1 text-[13px]"
+      class="cursor-pointer rounded-[6px] border-none px-3 py-1 text-[13px] transition-colors duration-150"
       :class="locale === l.code
-        ? 'bg-brand-emphasis-rest text-inverse font-semibold'
-        : 'bg-transparent text-neutral-muted font-medium'"
+        ? 'bg-brand-emphasis-rest text-inverse font-semibold hover:bg-brand-emphasis-hover'
+        : 'bg-transparent text-neutral-muted font-medium hover:bg-surface-l3 hover:text-neutral'"
       @click="setLocale(l.code)"
     >
       {{ l.label }}
