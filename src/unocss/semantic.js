@@ -423,9 +423,14 @@ export const semanticShortcuts = [
   semanticBgShortcut,
   semanticBorderShortcut,
   {
+    // Border-color helpers (combine with border-* width utilities).
     'divider-emphasis': 'border-[var(--divider-emphasis)]',
     'divider-default': 'border-[var(--divider-default)]',
     'divider-muted': 'border-[var(--divider-muted)]',
     'divider-quiet': 'border-[var(--divider-quiet)]',
+    // Hairline on one edge drawn with an inset shadow, so it never adds to
+    // the element's box height the way a border would.
+    'divider-b': 'shadow-[inset_0_-1px_0_var(--divider-default)]',
+    'divider-t': 'shadow-[inset_0_1px_0_var(--divider-default)]',
   },
 ]

@@ -33,6 +33,12 @@ export const typographyShortcuts = [{
   'text-subtitle2': 'text-[length:var(--font-size-subtitle2)] line-height-[var(--line-height-subtitle2)] font-semibold',
 }]
 
+// App-level layout shortcuts.
+export const layoutShortcuts = [{
+  // Centered content column shared by the stepper, main content and footer.
+  'wizard-shell': 'mx-auto max-w-[1200px]',
+}]
+
 export const breakpoints = {
   tablet: '768px',
   desktop: '1024px',
@@ -61,5 +67,6 @@ export const uiExtendTheme = (theme) => ({
 
 export const uiShortcuts = [
   ...typographyShortcuts,
+  ...layoutShortcuts,
   ...semanticShortcuts,
 ]

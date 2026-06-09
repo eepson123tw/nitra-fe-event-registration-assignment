@@ -4,7 +4,7 @@ import brandmark from '../assets/brandmark.svg'
 </script>
 
 <template>
-  <header class="bg-surface-l0" style="border-bottom: 1px solid var(--divider-default)">
+  <header class="bg-surface-l0 divider-b">
     <div class="row items-center q-px-xl" style="height: 72px">
       <!-- Brand mark: white emblem on the brand-emphasis tile (matches Figma logo) -->
       <div
