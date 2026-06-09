@@ -23,19 +23,18 @@ const cardRefs = ref([])
 function setCardRef(el, index) {
   cardRefs.value[index] = el
 }
-function activeTicketIndex() {
+// Index of the option that holds the single tab stop — the selected card, or
+// the first one when nothing is selected yet. Derived once per render.
+const activeTicketIndex = computed(() => {
   const i = tickets.findIndex((tk) => tk.id === state.ticketTypeId)
   return i === -1 ? 0 : i
-}
-function ticketTabindex(index) {
-  return index === activeTicketIndex() ? 0 : -1
-}
+})
 function onTicketKeydown(e) {
   const forward = e.key === 'ArrowRight' || e.key === 'ArrowDown'
   const backward = e.key === 'ArrowLeft' || e.key === 'ArrowUp'
   if (!forward && !backward) return
   e.preventDefault()
-  const next = (activeTicketIndex() + (forward ? 1 : -1) + tickets.length) % tickets.length
+  const next = (activeTicketIndex.value + (forward ? 1 : -1) + tickets.length) % tickets.length
   selectTicket(tickets[next].id)
   cardRefs.value[next]?.focus()
 }
@@ -75,7 +74,7 @@ const shippingError = computed(() =>
           :ref="(el) => setCardRef(el, index)"
           :ticket="ticket"
           :selected="state.ticketTypeId === ticket.id"
-          :tabindex="ticketTabindex(index)"
+          :tabindex="index === activeTicketIndex ? 0 : -1"
           @select="selectTicket"
         />
       </div>
