@@ -13,7 +13,14 @@ import MerchandiseCard from './MerchandiseCard.vue'
 import OrderSummary from '../../OrderSummary.vue'
 
 const { t } = useI18n()
-const { state } = useRegistration()
+const { state, validation } = useRegistration()
+
+// Inline "select a size" error for a specific merchandise item — sourced from
+// the shared validation (path `addons.<id>`) and gated until a submit attempt.
+function sizeError(id) {
+  const f = validation.value.fields[`addons.${id}`]
+  return state.validationAttempted && f ? t(f.messageKey) : ''
+}
 
 const categories = [
   { key: 'workshop', label: t('addons.tabs.workshop') },
@@ -149,6 +156,7 @@ function onTabKeydown(e) {
               :addon="a"
               :quantity="state.addons[a.id]?.quantity || 0"
               :size="state.addons[a.id]?.size || ''"
+              :error="sizeError(a.id)"
               @update="(payload) => updateMerch(a.id, payload)"
             />
           </template>

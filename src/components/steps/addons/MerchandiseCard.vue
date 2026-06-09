@@ -10,6 +10,8 @@ const props = defineProps({
   addon: { type: Object, required: true },
   quantity: { type: Number, default: 0 },
   size: { type: String, default: '' },
+  /** Inline validation message (e.g. size required) — shown after a submit attempt. */
+  error: { type: String, default: '' },
 })
 const emit = defineEmits(['update'])
 
@@ -46,7 +48,9 @@ function onSize(e) {
           <select
             :value="size"
             :aria-label="$t('addons.size')"
-            class="appearance-none cursor-pointer rounded-[6px] border border-solid border-neutral-muted bg-surface-l0 py-1.5 pl-3 pr-6 text-sm font-medium text-neutral"
+            :aria-invalid="!!error"
+            class="appearance-none cursor-pointer rounded-[6px] border border-solid bg-surface-l0 py-1.5 pl-3 pr-6 text-sm font-medium text-neutral"
+            :class="error ? 'border-danger-emphasis' : 'border-neutral-muted'"
             @change="onSize"
           >
             <option value="">{{ $t('addons.selectSize') }}</option>
@@ -66,7 +70,8 @@ function onSize(e) {
       />
     </div>
 
-    <p v-if="selected" class="m-0 text-[11px] font-semibold text-success">
+    <p v-if="error" class="m-0 text-[11px] font-medium text-danger">{{ error }}</p>
+    <p v-else-if="selected" class="m-0 text-[11px] font-semibold text-success">
       ✓ {{ $t('addons.added') }}
     </p>
   </div>
