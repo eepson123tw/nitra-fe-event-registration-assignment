@@ -25,7 +25,8 @@ const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.leng
     <div
       v-for="line in summary.lines"
       :key="line.id"
-      class="row items-start justify-between full-width text-sm text-neutral-muted"
+      class="row items-start justify-between full-width text-sm"
+      :class="line.kind === 'merchandise' ? 'font-medium text-brand-emphasis' : 'text-neutral-muted'"
     >
       <span>{{ line.kind === 'merchandise' ? `${line.name} × ${line.quantity}` : line.name }}</span>
       <span>{{ formatCurrency(line.amount) }}</span>

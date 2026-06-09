@@ -57,6 +57,13 @@ No inline validation runs before Step 4. The rules live in a single **zod** sche
 **Track badge colours — deterministic, not copied from the mockup.**
 The Figma colours the session-track badges inconsistently: two FRONTEND sessions get different colours (one orange `orange/50`+`orange/600`, one yellow `yellow/200`+`yellow/900`), so there is no per-track rule to copy. I instead assigned one distinct palette colour per track — `main → gray`, `frontend → orange`, `backend → blue`, `devops → yellow` — so the colour actually encodes the track (a blue badge always means backend). Full/disabled sessions mute the badge to gray, matching the design's disabled card. Judgment call: a consistent mapping beats faithfully reproducing the mockup's ad-hoc colouring.
 
+**Design-source observations — inconsistencies in the Figma, and how I resolved them.**
+A couple of places where the design source contradicts itself; in each I implemented one consistent rule rather than reproducing the artifact, and noted it here so the deviation is intentional and reviewable:
+
+1. **Label / badge colours aren't defined as a clear rule.** Beyond the track badges above, the design has no single token mapping for its category/label colours — the same semantic label is coloured differently across frames. Rather than copy per-frame colours, I derive colours from a deterministic rule (per-track palette for session badges; semantic tokens everywhere else).
+
+2. **An undocumented brand-coloured/bold line in the order summary — read as "merchandise".** In the source, one summary line is rendered in the brand colour and visually heavier (teal, bold) with no documented reason (Figma: a 13px `text/brand/emphasis` label vs. the muted `body/sm` lines around it). It first looked like an arbitrary "last item" highlight, but the highlighted line is consistently a **merchandise** product (e.g. the teal `Sticker Pack × 3` line). I read the design's intent as *merchandise line items are visually distinguished from the ticket / workshop / meal lines* — which gives the highlight a meaning (it marks the shippable goods) instead of landing on whatever item happens to be last. So merchandise summary lines render in `text-brand-emphasis` (medium weight) while the others stay muted, applied consistently in both the live order summary (Step 3) and the review pricing (Step 4); the discount stays its own brand-coloured line and only the Total is bold. This is an interpretation — the source never states the rule — but a consistent, meaningful one beats reproducing the artifact verbatim.
+
 ## 3. Dependency choices
 
 Added runtime dependencies: **vue-i18n**, and **vee-validate** + **@vee-validate/zod** + **zod** for validation.

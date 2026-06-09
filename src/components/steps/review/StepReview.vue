@@ -185,7 +185,8 @@ const addonRows = computed(() => {
       <div
         v-for="line in summary.lines"
         :key="line.id"
-        class="flex items-start justify-between gap-4 text-[12px] font-regular leading-[16px] text-neutral-muted"
+        class="flex items-start justify-between gap-4 text-[12px] leading-[16px]"
+        :class="line.kind === 'merchandise' ? 'font-medium text-brand-emphasis' : 'font-regular text-neutral-muted'"
       >
         <span>{{ line.kind === 'merchandise' ? `${line.name} × ${line.quantity}` : line.name }}</span>
         <span>{{ formatCurrency(line.amount) }}</span>
