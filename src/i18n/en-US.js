@@ -37,6 +37,12 @@ export default {
       required: 'Shipping address is required for merchandise orders',
     },
   },
+  sessions: {
+    sectionTitle: 'Select Sessions',
+    selectedCount: 'No sessions selected | {count} session selected | {count} sessions selected',
+    spotsLeft: '{count} spot left | {count} spots left',
+    soldOut: 'Sold Out',
+  },
   common: {
     comingSoon: 'Coming soon',
   },
