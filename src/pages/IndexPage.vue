@@ -86,7 +86,8 @@ function restart() {
 
 <template>
   <div class="flex flex-col min-h-screen bg-surface-l0">
-    <!-- Header + stepper stay pinned so the user keeps their place on long steps -->
+    <!-- Header stays; the stepper shows only while moving through the wizard.
+         Pinned so the user keeps their place on long steps. -->
     <div class="sticky top-0 z-10 bg-surface-l0">
       <AppHeader />
       <WizardStepper
@@ -98,16 +99,19 @@ function restart() {
       />
     </div>
 
-    <!-- Step content (or the confirmation screen once submitted) -->
-    <main class="col-grow full-width q-px-md">
-      <div class="wizard-shell py-10">
-        <SuccessScreen v-if="submitted" :code="confirmationCode" @restart="restart" />
-        <component :is="currentComponent" v-else @navigate="goTo" />
-      </div>
-    </main>
+    <!-- Confirmation screen: centred in the area left below the header -->
+    <SuccessScreen v-if="submitted" :code="confirmationCode" @restart="restart" />
 
-    <!-- Footer navigation -->
-    <footer v-if="!submitted" class="bg-surface-l0 q-px-md divider-t">
+    <template v-else>
+      <!-- Step content -->
+      <main class="col-grow full-width q-px-md">
+        <div class="wizard-shell py-10">
+          <component :is="currentComponent" @navigate="goTo" />
+        </div>
+      </main>
+
+      <!-- Footer navigation -->
+      <footer class="bg-surface-l0 q-px-md divider-t">
       <div
         class="row items-center q-py-md wizard-shell"
         :class="isFirstStep ? 'justify-end' : 'justify-between'"
@@ -142,6 +146,7 @@ function restart() {
           @click="onSubmit"
         />
       </div>
-    </footer>
+      </footer>
+    </template>
   </div>
 </template>

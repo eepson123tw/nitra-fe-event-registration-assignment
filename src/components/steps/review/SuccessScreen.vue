@@ -1,10 +1,10 @@
 <script setup>
-// Post-submission confirmation. Shown in place of the wizard once validation
-// passes: a success mark, the confirmation number, a thank-you note, and a
-// recap of the order. "Back to Home" asks the host to reset the wizard.
+// Post-submission confirmation — matches the Figma "Success State" frame:
+// a green check, a green title, the confirmation number, and a short note.
+// Deliberately minimal (no order recap); "Back to Home" resets the wizard.
 import { event } from '../../../mocks/event.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
-import OrderSummary from '../../OrderSummary.vue'
+import successIcon from '../../../assets/successIcon.svg'
 
 defineProps({
   /** Generated confirmation reference, e.g. "TC2025-48217". */
@@ -17,23 +17,18 @@ const { state } = useRegistration()
 </script>
 
 <template>
-  <section class="flex flex-col items-center gap-6 py-10 text-center">
-    <div class="flex flex-center h-16 w-16 rounded-full bg-success-emphasis-rest">
-      <q-icon name="check" size="36px" class="text-inverse" />
-    </div>
+  <section class="flex flex-1 flex-col items-center justify-center gap-4 px-4 text-center">
+    <img :src="successIcon" alt="" class="h-20 w-20" />
 
-    <div class="flex flex-col gap-2">
-      <h2 class="m-0 text-h2 font-bold text-neutral">{{ $t('success.title') }}</h2>
-      <p class="m-0 text-md font-semibold text-success-emphasis">
-        {{ $t('success.confirmation', { code }) }}
-      </p>
-    </div>
+    <h2 class="m-0 text-h2 text-success">{{ $t('success.title') }}</h2>
 
-    <p class="m-0 max-w-[480px] text-md text-neutral-muted">
-      {{ $t('success.message', { event: event.name, email: state.attendee.email }) }}
+    <p class="m-0 text-lg font-regular text-neutral">
+      {{ $t('success.confirmation', { code }) }}
     </p>
 
-    <OrderSummary class="w-full max-w-[420px] text-left" />
+    <p class="m-0 max-w-[420px] text-sm font-regular text-neutral-muted">
+      {{ $t('success.message', { event: event.name, email: state.attendee.email }) }}
+    </p>
 
     <q-btn
       unelevated
