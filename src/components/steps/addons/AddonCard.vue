@@ -49,7 +49,7 @@ function toggle() {
       <span class="text-neutral">{{ addon.name }}</span>
       <span class="text-brand-emphasis">{{ currency(addon.price, { cents: false }) }}</span>
     </div>
-    <p class="m-0 text-sm text-neutral-muted">{{ addon.description }}</p>
+    <p class="m-0 text-sm font-normal text-neutral-muted">{{ addon.description }}</p>
     <p v-if="timeLabel" class="m-0 text-[11px] leading-[14px] text-neutral-quiet">{{ timeLabel }}</p>
     <p
       v-if="status"

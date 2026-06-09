@@ -22,7 +22,7 @@ const isEmpty = computed(() => !props.summary.ticket && props.summary.lines.leng
 <template>
   <div
     v-if="summary.ticket"
-    class="row items-start justify-between full-width text-sm text-neutral-muted"
+    class="row items-start justify-between full-width text-sm font-regular text-neutral-muted"
   >
     <span>{{ $t('summary.ticket', { name: summary.ticket.name }) }}</span>
     <span>{{ currency(summary.ticket.amount) }}</span>
@@ -31,8 +31,8 @@ const isEmpty = computed(() => !props.summary.ticket && props.summary.lines.leng
   <div
     v-for="line in summary.lines"
     :key="line.id"
-    class="row items-start justify-between full-width text-sm"
-    :class="line.kind === 'merchandise' ? 'font-medium text-brand-emphasis' : 'text-neutral-muted'"
+    class="row items-start justify-between full-width text-sm font-regular"
+    :class="line.kind === 'merchandise' ? 'text-brand-emphasis' : 'text-neutral-muted'"
   >
     <span>{{ line.kind === 'merchandise' ? `${line.name} × ${line.quantity}` : line.name }}</span>
     <span>{{ currency(line.amount) }}</span>

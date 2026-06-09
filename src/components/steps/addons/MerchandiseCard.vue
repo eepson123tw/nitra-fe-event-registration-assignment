@@ -40,7 +40,7 @@ function onSize(e) {
       <span>{{ addon.name }}</span>
       <span>{{ currency(addon.price, { cents: false }) }}</span>
     </div>
-    <p class="m-0 text-sm text-neutral-muted">{{ addon.description }}</p>
+    <p class="m-0 text-sm font-normal text-neutral-muted">{{ addon.description }}</p>
 
     <div class="row items-center no-wrap gap-4">
       <!-- Size selector (only for items that offer sizes) -->
