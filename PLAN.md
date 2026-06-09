@@ -5,9 +5,9 @@
 
 ---
 
-## 1. Planning & task breakdown
+## 1. Task breakdown & execution plan
 
-I read both the assignment brief (authoritative) and `README.md` (step-level spec) before starting. The app is a 4-step wizard backed entirely by mock data in `src/mocks/` — no backend. I broke the work into phases, each landing as its own atomic commit so the history reflects the real build order:
+I read both the assignment brief (authoritative) and `README.md` (step-level spec) before starting. The app is a 4-step wizard backed entirely by mock data in `src/mocks/` — no backend. I broke the work into phases, each landing as its own atomic commit so the history reflects the real build order. The phases below are the *plan*; the **Appendix** logs what each one actually produced (and where I had to course-correct):
 
 0. **Scaffold** — folder structure, dependencies, i18n boot, `QStepper` shell, shared cross-step state via a composable + `provide`/`inject`, empty step components wired to navigation.
 1. **Step 1 — Attendee Info** — text/email/tel fields via `defineModel`, three single-select ticket cards. No inline validation (deferred to Step 4 per spec).
@@ -17,7 +17,7 @@ I read both the assignment brief (authoritative) and `README.md` (step-level spe
 5. **Design fidelity pass** — match the Figma design, all interactive states (hover / disabled / error / active), semantic tokens only.
 6. **Polish & nice-to-haves** — transitions, loading/disabled states, i18n coverage, responsive/mobile layout.
 
-## 2. Architecture & key decisions
+## 2. Architectural decisions & design rationale
 
 **Cross-step state — composable + `provide`/`inject`.**
 A single `useRegistration` composable owns the wizard's reactive state (attendee info, ticket type, selected session IDs, selected add-ons with size/quantity). `IndexPage.vue` provides it once; each step injects it. This keeps all form data alive across forward/backward navigation without prop-drilling, and is the pattern the brief calls out explicitly. Pinia would be overkill for a single-wizard, single-route app and isn't in the starter.
@@ -68,7 +68,14 @@ A couple of places where the design source contradicts itself; in each I impleme
 
 4. **The Figma says "2025"; the brief + data say "2028".** The Figma frames label the event "WebDev Summit 2025" (and the success-state mock even references "TechConf 2025"), but the assignment brief and `mocks/event.js` both name it **"WebDev Summit 2028"**. I treated the data as the source of truth: the event name is rendered from `event.name` (data-driven, never hardcoded), so the header reads "WebDev Summit 2028" and stays correct if the data changes — rather than reproducing the mockup's stale year. Same reasoning for the confirmation copy (it interpolates the real `event.name`, not "TechConf 2025").
 
-## 3. Dependency choices
+5. **A merchandise name embeds a size that contradicts its size selector.** `mocks/addons.js` names `merch4` `Laptop Sleeve (15")` yet also gives it `sizes: ['13"', '15"', '16"']` — so picking 13" leaves the hardcoded "(15")" in the product name, which reads as a contradiction. The chosen size *is* captured correctly (`addons.<id>.size`, shown by the picker and appended in the order summary, e.g. "… — 13\""); only the name's literal "(15")" is the mock's own inconsistency. I left the mock untouched (it stands in for an API I don't own) and treat the `size` field as the source of truth — in a real project I'd flag the product name to whoever owns the catalog.
+
+**Nice-to-haves, built in from the start (in scope).**
+
+- **i18n** via `vue-i18n` — every user-facing string goes through a translation key from day one (avoids a costly retrofit later), and a `zh-TW` locale ships alongside `en-US` with a language switcher + browser auto-detection. The mock *content* (session/add-on/ticket names) is also localized via `useCatalog()`, keeping proper nouns in English; dates and currency are formatted per active locale (`Intl`). See §3 for the dependency rationale.
+- **Responsive / mobile** — layouts are built mobile-first using the project's UnoCSS breakpoints (`tablet: 768px`, `desktop: 1024px`); the content column and stepper degrade gracefully on narrow screens (full mobile polish noted as future work in §6).
+
+## 3. Dependency choices & trade-offs
 
 Added runtime dependencies: **vue-i18n**, and **vee-validate** + **@vee-validate/zod** + **zod** for validation.
 
@@ -80,12 +87,7 @@ Added runtime dependencies: **vue-i18n**, and **vee-validate** + **@vee-validate
 
 > **date-fns — evaluated, then removed.** It was added during scaffolding for date handling, but the session/workshop timestamps are fixed UTC ISO strings (`…Z`) and the design renders them as UTC wall-clock times (`09:00Z` → "9:00 AM" for every viewer). `Intl.DateTimeFormat({ timeZone: 'UTC' })` does this correctly in one call, whereas date-fns' `format()` runs in the viewer's local zone — matching the design would have meant adding `date-fns-tz` on top. Time formatting, day-grouping and interval-overlap are all trivial with native `Date`/`Intl` (`src/utils/datetime.js`), so date-fns was removed rather than left as an unused dependency. Currency uses the built-in `Intl.NumberFormat`.
 
-## 4. Nice-to-haves (in scope)
-
-- **i18n** via `vue-i18n` — all user-facing strings go through translation keys from day one.
-- **Responsive / mobile** — layouts built mobile-first using the project's UnoCSS breakpoints (`tablet: 768px`, `desktop: 1024px`).
-
-## 5. AI tool usage
+## 4. AI-assisted development & reflection
 
 Primary tool: **Claude Code** (interactive agent), used throughout. Notable sessions so far:
 
@@ -108,28 +110,37 @@ The most useful thing I did was treat the agent's output as a *draft* and keep p
 
 **What worked / what didn't.**
 
+> **How I verified — Playwright *and* DevTools, not just one.** Two complementary loops: scripted Playwright runs drove the flows end-to-end and captured full-page screenshots to diff against the Figma frames, while Chrome DevTools was used by hand to inspect the *rendered* result — the **Elements** panel for the actual DOM structure and ARIA roles/`tabindex` (confirming the radiogroup/checkbox/tablist markup really emitted), and the **Computed** panel for the *resolved* CSS, which is how the token/class bugs were caught (e.g. a badge's computed `color` resolving to Quasar's `.text-warning` instead of the UnoCSS token, or a field's box-model measured against the Figma px). Screenshots tell you it looks wrong; the Computed panel tells you *which* declaration won.
+
 | Worked | Didn't — needed steering |
 | --- | --- |
 | Handing Claude the Figma node via the MCP so it mapped to the repo's semantic tokens instead of inventing hex | First Step-1 pass "matched the tokens" but used the wrong typeface — looked off until we pulled the exact spec |
-| Making it *measure* (Playwright) and screenshot-compare against Figma rather than eyeball | Concluded the stepper connectors were one colour from a single state; wrong once steps complete |
+| Making it *measure* — Playwright scripts for flow/screenshots **plus** DevTools (Elements for DOM/roles, Computed for resolved CSS) — rather than eyeball | Concluded the stepper connectors were one colour from a single state; wrong once steps complete |
 | Pulling exact values with `get_variable_defs` instead of guessing | Reached for inline `style` and a hardcoded stepper height instead of the token + shortcut system |
 | Asking "why this element / value?" — surfaced the invalid `<button>` and the `q-btn` min-height floor | Used `<button>` with block content (invalid) and `q-py-[1.5]` (a class that doesn't exist) |
 
-## 6. Challenges & solutions
+## 5. Key challenges & technical solutions
 
 - **Toolchain mismatch on a clean machine.** `yarn install` failed the engine check (Node 20 vs required 22). Resolved by standardizing on `n` for Node and Corepack for Yarn 4, so the versions are enforced by `package.json` (`engines` + `packageManager`) for any future checkout. Also added Yarn 4's `.gitignore` rules so the regenerable `.yarn/install-state.gz` cache isn't committed.
+- **"Matches the tokens" ≠ "matches the design" (typeface fidelity).** The first Step-1 pass mapped layout + semantic colour tokens correctly but still looked wrong: Quasar ships no Roboto here, so text fell back to the system font while the design uses **Inter**. Rather than eyeballing, one `get_variable_defs` call pulled the exact spec — font = Inter, perk checks = `green/700` (not teal), heading = h3/24 (not 28), input radius 6 — and all were corrected (self-hosted Inter via `@fontsource-variable/inter`, `text-success-emphasis` checks, fixed type scale). Lesson logged: verify the rendered typeface and exact values, not just the colour names.
+- **UnoCSS has no border/divider preflight.** A plain `border-b` rendered nothing (no default `border-style`). Built `divider-b`/`divider-t` inset-shadow shortcuts for the chrome hairlines; and the summary separator briefly relied on a custom `divider-line` shortcut that the dev server didn't reliably apply (config-shortcut HMR/cache) — switched it to explicit per-class utilities (`h-px w-full bg-[var(--divider-muted,…)]`), which always regenerate on a `.vue` change.
+- **Quasar ↔ UnoCSS class collisions.** Quasar's global `.text-warning`/`.text-info` shadow the same-named UnoCSS semantic classes (rendering the wrong colour — this bit the Step-2 capacity bar and the Step-3 info banner), and Quasar's `.flex` adds `flex-wrap` (unlike UnoCSS's plain `display:flex`). Fixed by using palette utilities (`text-yellow-800`, `text-blue-500`) for those tones and `flex-1 min-w-0` on growable children. Caught in the DevTools **Computed** panel (the resolved `color` traced back to Quasar's global rule, not the UnoCSS token), not by eyeballing.
+- **`prefers-reduced-motion` froze the loading spinner.** My blanket reduced-motion rule (`animation-duration: 0.01ms !important`) also stopped the submit spinner, so under "Reduce motion" it didn't appear to spin. Exempted `.q-spinner` — a spinner is functional progress feedback, not decorative motion — while still neutralising transitions + smooth scroll.
+- **Browser autofill background.** Chrome paints autofilled fields with its own colour (forced `!important`), which a normal `background-color` can't override; repainted them to the design surface with the inset `box-shadow` trick + `-webkit-text-fill-color`.
 
-## 7. What I'd improve with more time
+## 6. Future improvements (given more time)
 
 - **Persist state.** A page refresh loses the in-progress registration. With more time I'd mirror the store to `sessionStorage` (or the URL) so a reload — or an accidental Edit-link round-trip — keeps the user's selections.
 - **Round out accessibility.** After the review pass, field errors are linked to inputs (`aria-describedby`), the stepper exposes `aria-current` + a per-step `aria-label` (so collapsed-on-mobile steps still announce), focus moves into each step on navigation, and every control has a focus ring. Still partial: the day/category tablists aren't fully wired to the WAI-ARIA tabs pattern (`aria-controls` / `aria-labelledby`), and the session-conflict cue isn't announced via `aria` on the card.
-- **Simulated submit loading.** There's no backend, so Submit validates + confirms synchronously; a real build would show a `loading` state on the button during the (mocked) request.
-- **De-duplicate the order summary.** `OrderSummary` (Step 3) and the Step-4 pricing block render the same `buildOrderSummary` output with parallel markup — a shared lines component would remove the drift risk (kept separate for now because the two live in different i18n namespaces and layout contexts).
 - **Responsive.** The layout degrades sensibly below 1200px and the stepper collapses its labels, but a real mobile pass (<768px touch-target sizing, denser cards) isn't fully designed or tested — the Figma only ships a 1440 frame.
 - **Tokenise a few arbitraries.** Spacing/radius now uses the numeric step scale (`p-4`, `rounded-2`); the values left in brackets are the genuinely off-scale ones — the 6px card radius (`rounded-[6px]` = the `border-radius/m` token) and small font sizes like `text-[11px]`/`text-[13px]` — which could become named tokens if the design system grows.
 - **Tests.** Out of scope per the brief, but the pricing and time-conflict logic are the parts I'd most want unit/component tests around before trusting them.
 
-## 8. Phase log
+---
+
+## Appendix: Detailed phase log
+
+A chronological record of what each phase produced and where I had to steer the agent. The headline challenges are distilled into §5; this is the long-form trail.
 
 **Phase 0 — Scaffold.**
 Added `vue-i18n` (and initially `date-fns`, later removed in the Step 2 phase once native `Intl` proved sufficient — see §3); wired vue-i18n via a Quasar boot file (`src/boot/i18n.js`, Composition mode) with an `en-US` locale registry under `src/i18n/`. Built the central state layer: `useRegistration.js` exposes `provideRegistration()` (called once in `IndexPage`) and `useRegistration()` (injected by steps), with the full typed state shape documented via JSDoc. `IndexPage.vue` hosts a `QStepper` (4 steps, `header-nav` for free forward/backward navigation, Back/Continue/Submit). Four step components are stubbed and rendered. Verified with a clean production build and a dev-server boot (no runtime errors).
@@ -140,7 +151,7 @@ Added `vue-i18n` (and initially `date-fns`, later removed in the Step 2 phase on
 Pulled the Step 1 design from Figma (via the hosted Figma MCP) and confirmed the token mapping: brand = teal (`#264D4F`, selection/active/checks), accent = orange (CTA). Replaced the placeholder `QStepper` with custom shared chrome that matches the design: `AppHeader` (logo + event name) and `WizardStepper` (numbered circles, done/active/upcoming states, clickable for free navigation). `IndexPage` now drives a step registry, renders the active step via `<component :is>`, and owns the footer Back/Next/Submit nav. Step 1 content: `TicketCard` (reusable, single-select, "Selected" badge) fed by `mocks/event.js`, and the attendee form built from a `LabeledInput` component using `defineModel` for two-way binding, two-column responsive grid, all bound to the shared state. All UI strings go through i18n keys; added `utils/currency.js` (Intl-based). Verified: clean build, dev boot with no warnings, and a headless-Chrome screenshot compared against the Figma frame.
 - Design decision: the header shows "WebDev Summit 2028" (from `mocks/event.js` + the brief), not the Figma mockup's stale "2025" — the title is data-driven, not hardcoded.
 - AI note: gave Claude the Figma node directly so it mapped colors to the repo's existing semantic tokens rather than inventing hex values. Figma MCP is rate-limited (Starter = 6 calls/month), so we cached one hi-res reference per screen and reused it instead of re-fetching.
-- Course-correction (important): on first pass Claude matched layout + semantic color tokens but the result still didn't look like the design. Reviewing against the Figma, the typeface was wrong — Quasar ships no Roboto here so text fell back to the system font, while the design uses **Inter**. Rather than eyeballing, we spent one `get_variable_defs` call to pull the exact spec, which revealed: font = Inter, perk checks = green/700 (not teal), "Attendee Information" = h3/24 (not 28), input radius 6. Fixed all of them (self-hosted Inter via `@fontsource-variable/inter`, `text-success-emphasis` checks, corrected type scale). Lesson logged: "matches the tokens" ≠ "matches the design" — verify the typeface and exact values, not just the color names. The button color (`#fb7429`) was already correct.
+- Course-correction (important): on first pass Claude matched layout + semantic color tokens but the result still didn't look like the design. Reviewing against the Figma, the typeface was wrong — Quasar ships no Roboto here so text fell back to the system font, while the design uses **Inter**. Rather than eyeballing, we spent one `get_variable_defs` call to pull the exact spec, which revealed: font = Inter, perk checks = green/700 (not teal), "Attendee Information" = h3/24 (not 28), input radius 6. Fixed all of them (self-hosted Inter via `@fontsource-variable/inter`, `text-success-emphasis` checks, corrected type scale). Lesson logged: "matches the tokens" ≠ "matches the design" — verify the typeface and exact values, not just the color names. The button color (`#fb7429`) was already correct. (Distilled into §5.)
 
 **Phase 1 (cont.) — pixel pass, layout system & accessibility.**
 A second pass against the Figma box-model annotations tightened Step 1 to spec and hardened the markup:
@@ -160,13 +171,13 @@ Sessions grouped by day (`Nov 15` / `Nov 16`) behind an accessible day **tablist
 - **Capacity colour tiers.** Reverse-engineered from the Figma samples: full → danger red, ≥75% → orange, ≥50% → yellow-800, <50% → brand — applied to both the bar and the spots label.
 - **`full` = disabled, data-driven.** The mockup greyed an arbitrary *non-full* card (s5) as a sample; I bind the disabled state to the data (`registered >= capacity`), so the genuinely-full s2/s9 are disabled while s5 stays selectable.
 - **Track badge colours — deterministic** (one distinct palette colour per track, badge greyed when disabled) — see §2.
-- AI notes / course-corrections: (1) the capacity bar and its label rendered as *different* colours — root cause was Quasar's global `.text-warning` overriding the UnoCSS `text-warning` shortcut; switched to the `text-yellow-800` palette utility. (2) The active day tab had a transparent background — a static `bg-transparent` was beating the conditional `bg-brand-emphasis-rest`; moved the background into the conditional. (3) Caught several static `style="…"` dimensions and converted them to UnoCSS utilities (`h-4 w-4`, `h-1.5`, `h-[72px]`…), keeping `:style` only for the runtime capacity-bar width. Recurring lesson: verify computed values (colour/size), and watch for Quasar-vs-UnoCSS class-name collisions.
+- AI notes / course-corrections: (1) the capacity bar and its label rendered as *different* colours — root cause was Quasar's global `.text-warning` overriding the UnoCSS `text-warning` shortcut; switched to the `text-yellow-800` palette utility. (2) The active day tab had a transparent background — a static `bg-transparent` was beating the conditional `bg-brand-emphasis-rest`; moved the background into the conditional. (3) Caught several static `style="…"` dimensions and converted them to UnoCSS utilities (`h-4 w-4`, `h-1.5`, `h-[72px]`…), keeping `:style` only for the runtime capacity-bar width. Recurring lesson: verify computed values in the DevTools **Computed** panel (colour/size) — it's what surfaced the Quasar-vs-UnoCSS class-name collision by showing which declaration actually won. (Distilled into §5.)
 
 **Phase 3 — Add-ons.**
 Workshops / meals / merchandise under an accessible category tablist, beside a live order summary (two columns that stack below `lg`). Workshops and meals are selectable `AddonCard`s; workshops show spots remaining and are disabled when sold out or when they overlap a session selected in Step 2 (via the shared `intervalsOverlap()`). Merchandise uses a `MerchandiseCard` with a native size `<select>` and a 0..maxQuantity `QuantityPicker`; adding any merchandise reveals the shipping info banner. Pricing lives in a pure `utils/pricing.js` (`buildOrderSummary` — ticket + add-ons, VIP 10% workshop discount, total) so it's testable and reusable in Step 4; `OrderSummary` only formats it.
 
 - **Component organisation.** With three steps' worth of components, each step's container + child components now live under `components/steps/<step>/`, while shared primitives (`AppHeader`, `WizardStepper`, `LabeledInput`, `QuantityPicker`, `OrderSummary`) stay at the components root.
-- AI note / course-correction: the merchandise info banner first used the `text-info` semantic shortcut for its icon, which Quasar's global `.text-info` silently overrode — switched to the `text-blue-500` palette utility (the warning/info names clash with Quasar; success/danger are safe). The Step 2 capacity-bar colour bug had already flagged this class of issue.
+- AI note / course-correction: the merchandise info banner first used the `text-info` semantic shortcut for its icon, which Quasar's global `.text-info` silently overrode — switched to the `text-blue-500` palette utility (the warning/info names clash with Quasar; success/danger are safe). The Step 2 capacity-bar colour bug had already flagged this class of issue. (Distilled into §5.)
 
 **UX — sticky header + stepper.**
 On long steps (the add-ons list, the review page) the stepper used to scroll out of view, so the user lost track of where they were. Wrapped the `AppHeader` + `WizardStepper` in a `sticky top-0 z-10` opaque container so the chrome stays pinned while step content scrolls underneath. Verified the pin holds after scrolling and content passes cleanly behind it.
