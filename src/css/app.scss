@@ -68,13 +68,19 @@ select {
   opacity: 0;
 }
 
-// Success screen: gentle fade + scale-in.
-.success-enter-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+// Wizard <-> success cross-fade (mode="out-in"): the review fades out, then the
+// confirmation fades + lifts in — so completing a submit reads as a transition,
+// not an instant swap.
+.view-enter-active,
+.view-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-.success-enter-from {
+.view-enter-from {
   opacity: 0;
-  transform: scale(0.98);
+  transform: translateY(6px);
+}
+.view-leave-to {
+  opacity: 0;
 }
 
 // Accessibility: honour reduced-motion — neutralise all transitions/animations.

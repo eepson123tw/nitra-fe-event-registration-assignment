@@ -37,6 +37,8 @@ const STEP_COUNT = stepDefs.length
 const current = ref(1)
 // Set once submission succeeds — swaps the wizard for the confirmation screen.
 const submitted = ref(false)
+// True while the (simulated) submission request is in flight.
+const submitting = ref(false)
 const confirmationCode = ref('')
 
 const steps = computed(() =>
@@ -85,8 +87,12 @@ async function onSubmit() {
     })
     return
   }
+  // Simulate a backend request so Submit shows a loading state (no real API).
+  submitting.value = true
+  await new Promise((resolve) => setTimeout(resolve, 700))
   confirmationCode.value = `TC2025-${Math.floor(10000 + Math.random() * 90000)}`
   submitted.value = true
+  submitting.value = false
 }
 
 function restart() {
@@ -113,12 +119,11 @@ function restart() {
       />
     </div>
 
-    <!-- Confirmation screen: centred in the area left below the header -->
-    <Transition name="success">
-      <SuccessScreen v-if="submitted" :code="confirmationCode" @restart="restart" />
-    </Transition>
+    <!-- Cross-fade between the wizard and the confirmation screen -->
+    <Transition name="view" mode="out-in">
+      <SuccessScreen v-if="submitted" key="success" :code="confirmationCode" @restart="restart" />
 
-    <template v-if="!submitted">
+      <div v-else key="wizard" class="flex flex-1 flex-col">
       <!-- Step content (animated on step change). The wrapper takes focus after
            each transition so keyboard/SR users land in the new step. -->
       <main class="col-grow full-width q-px-md">
@@ -161,12 +166,14 @@ function restart() {
           color="accent"
           :label="$t('nav.submit')"
           :disable="submitDisabled"
+          :loading="submitting"
           padding="10px 16px"
           class="rounded-[10px] text-md font-semibold transition-all duration-150 hover:-translate-y-px hover:shadow-md active:translate-y-0"
           @click="onSubmit"
         />
       </div>
       </footer>
-    </template>
+      </div>
+    </Transition>
   </div>
 </template>

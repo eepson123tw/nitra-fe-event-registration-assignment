@@ -1,4 +1,5 @@
 import { reactive, ref, computed, watch, provide, inject } from 'vue'
+import { debounce } from 'quasar'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import {
@@ -113,15 +114,15 @@ export function provideRegistration() {
     return result
   }
 
-  // After the first submit attempt, re-validate as the user edits so errors
-  // clear (and reappear) live — validation stays deferred until then. `deep` is
+  // After the first submit attempt, re-validate (debounced) as the user edits so
+  // errors clear/reappear live — validation stays deferred until then. `deep` is
   // required: toFormValues() reads `selectedSessionIds`/`addons` as references,
-  // so without it, in-place session/add-on mutations wouldn't re-trigger. The
-  // run is cheap for this dataset (a debounce would be the next step at scale).
+  // so without it, in-place session/add-on mutations wouldn't re-trigger.
+  const debouncedValidate = debounce(validateAll, 200)
   watch(
     () => toFormValues(state),
     () => {
-      if (state.validationAttempted) validateAll()
+      if (state.validationAttempted) debouncedValidate()
     },
     { deep: true },
   )
