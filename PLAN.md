@@ -62,7 +62,23 @@ Primary tool: **Claude Code** (interactive agent), used throughout. Notable sess
 - **Onboarding docs.** Generated `CLAUDE.md` (architecture + conventions) and recorded the team convention that all in-file comments must be English.
 - **Planning.** Used Claude to turn the brief + README into the phased plan and architecture decisions above, choosing patterns against the published evaluation weights.
 
-> Detailed prompts, what the AI got right, and where I corrected it will be logged per phase as the build proceeds.
+**Representative prompts → corrections (Step 1).**
+The most useful thing I did was treat the agent's output as a *draft* and keep probing it. A few of the real prompts that actually drove quality:
+
+- *"Why use a `<button>` for the ticket card?"* — Claude confirmed a `<button>` wrapping `<div>/<p>/<ul>` is invalid HTML, and that a single-select group is semantically a radiogroup, then refactored the cards to a WAI-ARIA `radiogroup` (roles, `aria-checked`, roving `tabindex`, arrow-key nav, focus-visible ring).
+- *"Where do those extra 13px come from?"* — I had it measure with Playwright instead of guessing: the label→input gap was 8px instead of the Figma's 6px (×4 rows = 8px); the remaining ~4px was a border-box-vs-Figma-frame measurement difference, not a real gap.
+- *"Do we really need these inline `style` tags — don't we have UnoCSS?"* — moved the dividers and the 1200 width off inline styles into `divider-b` / `divider-t` and `wizard-shell` shortcuts.
+- *"Why doesn't `q-py-[1.5]` change anything?"* — it's an invalid class, and a `q-btn`'s `min-height: 36px` floor swallows padding anyway; switched to Quasar's `padding` prop to hit the Figma 192×40 button.
+- *"The completed stepper line should change colour."* — this caught an earlier wrong conclusion of mine-via-Claude ("connectors are a single grey"), which had been drawn from only the Step-1 state where nothing is completed.
+
+**What worked / what didn't.**
+
+| Worked | Didn't — needed steering |
+| --- | --- |
+| Handing Claude the Figma node via the MCP so it mapped to the repo's semantic tokens instead of inventing hex | First Step-1 pass "matched the tokens" but used the wrong typeface — looked off until we pulled the exact spec |
+| Making it *measure* (Playwright) and screenshot-compare against Figma rather than eyeball | Concluded the stepper connectors were one colour from a single state; wrong once steps complete |
+| Pulling exact values with `get_variable_defs` instead of guessing | Reached for inline `style` and a hardcoded stepper height instead of the token + shortcut system |
+| Asking "why this element / value?" — surfaced the invalid `<button>` and the `q-btn` min-height floor | Used `<button>` with block content (invalid) and `q-py-[1.5]` (a class that doesn't exist) |
 
 ## 6. Challenges & solutions
 
@@ -70,7 +86,12 @@ Primary tool: **Claude Code** (interactive agent), used throughout. Notable sess
 
 ## 7. What I'd improve with more time
 
-_(to be filled in near the end)_
+- **Wire the unified validation.** Step 1's field states (required asterisk, danger label/border/message) are built and gated behind a `validationAttempted` flag, but nothing flips it yet — the Step 4 `validate()` that sets it and surfaces per-step error badges is still to come.
+- **Build Steps 2–4.** Session day-grouping + conflict detection, add-ons pricing (VIP workshop discount, qty/size), and the review/submit + success flow.
+- **date-fns is installed but not yet exercised** — it's there for the upcoming session/workshop date parsing and time ranges; right now Step 1 uses none of it.
+- **Responsive.** The layout degrades sensibly below 1200px, but a real mobile pass (<768px single column, touch-target sizing) isn't designed or tested — the Figma only ships a 1440 frame.
+- **Tokenise a few arbitraries.** One-offs like `text-[11px]` / `py-[40px]` could become named scale tokens if the design system grows, rather than living as bracket values.
+- **Tests.** Out of scope per the brief, but the pricing and time-conflict logic are the parts I'd most want unit/component tests around before trusting them.
 
 ## 8. Phase log
 
