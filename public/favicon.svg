@@ -1,0 +1,9 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Brand tile (bg/brand/emphasis/rest) with the white emblem, mirroring the app header logo -->
+  <rect width="40" height="40" rx="8" fill="#264D4F"/>
+  <g transform="translate(6 12.5)">
+    <path d="M20.9993 14.0228C9.7309 13.9904 13.3548 7.02063 7.00049 7.01156V0C16.641 0.0140325 14.0422 7.00133 20.9993 7.01127V14.0225V14.0228Z" fill="white"/>
+    <path d="M28.0001 0H20.9995V7.01127H28.0001V0Z" fill="white"/>
+    <path d="M7.00058 7.01128H0V14.0225H7.00058V7.01128Z" fill="white"/>
+  </g>
+</svg>
