@@ -43,8 +43,6 @@ export const layoutShortcuts = [{
   // Keyboard focus ring (2px brand) — one definition instead of repeating the
   // var() shadow in every focusable card/button. Pair with `outline-none`.
   'focus-ring': 'focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]',
-  // 1px full-width separator line used inside the summary cards.
-  'divider-line': 'h-px w-full bg-[var(--divider-muted)]',
 }]
 
 export const breakpoints = {
