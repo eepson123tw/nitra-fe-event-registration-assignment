@@ -34,6 +34,18 @@ select {
   line-height: var(--line-height-lg);
 }
 
+// Browser autofill paints its own background (Chrome's blue/yellow) that a
+// normal background-color can't override. The inset box-shadow trick repaints
+// it to the design surface, and -webkit-text-fill-color keeps the text colour.
+.q-field__native:-webkit-autofill,
+.q-field__native:-webkit-autofill:hover,
+.q-field__native:-webkit-autofill:focus,
+.q-field__native:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-surface-l0, #fff) inset !important;
+  -webkit-text-fill-color: var(--text-neutral-default, rgba(0, 0, 0, 0.9)) !important;
+  caret-color: var(--text-neutral-default, rgba(0, 0, 0, 0.9));
+}
+
 // ── Motion ────────────────────────────────────────────────────────────────
 // Vue <Transition> classes used across the wizard. Kept global because the
 // transitioned element is often a child component's root (outside the host's
