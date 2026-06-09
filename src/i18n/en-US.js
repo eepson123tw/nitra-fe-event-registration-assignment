@@ -121,8 +121,8 @@ export default {
       jobTitle: 'Job title is required',
       ticketType: 'Please select a ticket type',
       shipping: 'Shipping address is required for merchandise orders',
-      sessionConflict: 'Time conflict: “{a}” overlaps “{b}”',
-      addonSize: 'Please select a size for {name}',
+      sessionConflict: 'Selected sessions have a time conflict',
+      addonSize: 'Select a size for your selected merchandise',
     },
   },
   success: {

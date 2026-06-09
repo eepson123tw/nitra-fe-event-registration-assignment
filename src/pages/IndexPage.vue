@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { provideRegistration } from '../composables/useRegistration.js'
 import AppHeader from '../components/AppHeader.vue'
@@ -13,7 +13,7 @@ import SuccessScreen from '../components/steps/review/SuccessScreen.vue'
 const { t } = useI18n()
 
 // Create + provide the shared wizard state for all steps.
-const { state, validation } = provideRegistration()
+const { state, validation, validateAll } = provideRegistration()
 
 // Step registry: order drives the stepper, the rendered component, and the
 // "next" button label. `nextLabel` is null on the final step (shows submit).
@@ -54,12 +54,22 @@ function goNext() {
 function goBack() {
   goTo(current.value - 1)
 }
-function onSubmit() {
-  // Run unified validation across all steps. On failure, surface errors in
-  // place (banner + red stepper) so the user can jump to any offending step;
-  // on success, generate a confirmation and show the success screen.
+async function onSubmit() {
+  // Run unified validation across all steps (vee-validate + zod). On failure,
+  // surface errors in place (banner + red stepper) so the user can jump to any
+  // offending step; on success, generate a confirmation and show the success.
   state.validationAttempted = true
-  if (validation.value.hasErrors) return
+  const { valid } = await validateAll()
+  if (!valid) {
+    // The error banner lives at the top of the review; the Submit button is at
+    // the bottom of a long page. Bring the banner into view (and focus it for
+    // screen readers) so the validation result is obvious, not silent.
+    nextTick(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      document.getElementById('review-error-banner')?.focus({ preventScroll: true })
+    })
+    return
+  }
   confirmationCode.value = `TC2025-${Math.floor(10000 + Math.random() * 90000)}`
   submitted.value = true
 }

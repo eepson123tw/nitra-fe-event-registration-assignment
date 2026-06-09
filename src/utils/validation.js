@@ -1,10 +1,12 @@
-// Unified, presentation-free validation for the whole wizard.
+// Unified validation for the whole wizard, expressed as a zod schema.
 //
-// Per the spec, no step validates inline — Step 4 runs this across every step
-// at submit time. The function is pure (state + mock data in, issues out) and
-// returns i18n message keys (+ params) rather than translated strings, so the
-// view layer owns all wording. Each issue is tagged with the 1-based step it
-// belongs to, which drives both the Review banner and the stepper error marks.
+// Per the spec, nothing validates inline — Step 4 runs this across every step
+// at submit time (vee-validate drives the run; see useRegistration.js). The
+// schema is the single source of rules; messages are i18n KEYS (translated in
+// the view layer). Field-format rules and the cross-step business rules
+// (conditional shipping, session time conflicts, merchandise size) all live in
+// one superRefine so each path yields a single, predictable issue.
+import { z } from 'zod'
 import { sessions } from '../mocks/sessions.js'
 import { addons } from '../mocks/addons.js'
 import { intervalsOverlap } from './datetime.js'
@@ -24,76 +26,96 @@ const MERCH_IDS = new Set(
 
 /** Whether any selected add-on is merchandise (which makes shipping required). */
 export function hasMerchandiseSelected(state) {
-  return Object.entries(state.addons).some(
+  return Object.entries(state.addons ?? {}).some(
     ([id, sel]) => MERCH_IDS.has(id) && sel.quantity > 0,
   )
 }
 
-/**
- * Validate the entire registration.
- * @returns {{
- *   issues: { step: number, field: string, messageKey: string, params?: object }[],
- *   fields: Record<string, { messageKey: string, params?: object }>,
- *   stepHasError: Record<number, boolean>,
- *   hasErrors: boolean,
- * }}
- */
-export function validateRegistration(state) {
-  const issues = []
+/** Maps each schema path to the wizard step it belongs to (drives the stepper + banner). */
+export const STEP_BY_FIELD = {
+  fullName: 1,
+  email: 1,
+  phone: 1,
+  company: 1,
+  jobTitle: 1,
+  ticketType: 1,
+  shippingAddress: 1,
+  sessions: 2,
+  addons: 3,
+}
+
+/** Stable display order for the error banner (by step, then this field order). */
+export const FIELD_ORDER = [
+  'fullName', 'email', 'phone', 'company', 'jobTitle', 'ticketType',
+  'shippingAddress', 'sessions', 'addons',
+]
+
+/** Flatten the reactive store into the plain object the schema validates. */
+export function toFormValues(state) {
   const a = state.attendee
-  const push = (step, field, messageKey, params) =>
-    issues.push({ step, field, messageKey, ...(params ? { params } : {}) })
-
-  // ── Step 1: attendee info + ticket type ──
-  if (!a.fullName.trim()) push(1, 'fullName', 'review.errors.fullName')
-
-  if (!a.email.trim()) push(1, 'email', 'review.errors.emailRequired')
-  else if (!EMAIL_RE.test(a.email.trim())) push(1, 'email', 'review.errors.emailInvalid')
-
-  if (!a.phone.trim()) push(1, 'phone', 'review.errors.phoneRequired')
-  else if (!isValidPhone(a.phone.trim())) push(1, 'phone', 'review.errors.phoneInvalid')
-
-  if (!a.company.trim()) push(1, 'company', 'review.errors.company')
-  if (!a.jobTitle.trim()) push(1, 'jobTitle', 'review.errors.jobTitle')
-  if (!state.ticketTypeId) push(1, 'ticketType', 'review.errors.ticketType')
-
-  if (hasMerchandiseSelected(state) && !a.shippingAddress.trim()) {
-    push(1, 'shippingAddress', 'review.errors.shipping')
+  return {
+    fullName: a.fullName,
+    email: a.email,
+    phone: a.phone,
+    company: a.company,
+    jobTitle: a.jobTitle,
+    shippingAddress: a.shippingAddress,
+    ticketType: state.ticketTypeId,
+    sessions: state.selectedSessionIds,
+    addons: state.addons,
   }
+}
 
-  // ── Step 2: time conflicts among the selected sessions ──
-  const selected = sessions.filter((s) => state.selectedSessionIds.includes(s.id))
-  for (let i = 0; i < selected.length; i += 1) {
-    for (let j = i + 1; j < selected.length; j += 1) {
-      const x = selected[i]
-      const y = selected[j]
-      if (intervalsOverlap(x.date, x.endDate, y.date, y.endDate)) {
-        push(2, `conflict:${x.id}:${y.id}`, 'review.errors.sessionConflict', {
-          a: x.title,
-          b: y.title,
+export const registrationSchema = z
+  .object({
+    fullName: z.string(),
+    email: z.string(),
+    phone: z.string(),
+    company: z.string(),
+    jobTitle: z.string(),
+    shippingAddress: z.string(),
+    ticketType: z.string().nullable(),
+    sessions: z.array(z.string()),
+    addons: z.record(z.string(), z.any()),
+  })
+  .superRefine((v, ctx) => {
+    const fail = (field, message) =>
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [field], message })
+
+    // ── Step 1: attendee info + ticket type ──
+    if (!v.fullName.trim()) fail('fullName', 'review.errors.fullName')
+
+    if (!v.email.trim()) fail('email', 'review.errors.emailRequired')
+    else if (!EMAIL_RE.test(v.email.trim())) fail('email', 'review.errors.emailInvalid')
+
+    if (!v.phone.trim()) fail('phone', 'review.errors.phoneRequired')
+    else if (!isValidPhone(v.phone.trim())) fail('phone', 'review.errors.phoneInvalid')
+
+    if (!v.company.trim()) fail('company', 'review.errors.company')
+    if (!v.jobTitle.trim()) fail('jobTitle', 'review.errors.jobTitle')
+    if (!v.ticketType) fail('ticketType', 'review.errors.ticketType')
+
+    if (hasMerchandiseSelected({ addons: v.addons }) && !v.shippingAddress.trim()) {
+      fail('shippingAddress', 'review.errors.shipping')
+    }
+
+    // ── Step 2: time conflicts among selected sessions ──
+    const selected = sessions.filter((s) => v.sessions.includes(s.id))
+    const conflict = selected.some((x, i) =>
+      selected.slice(i + 1).some((y) => intervalsOverlap(x.date, x.endDate, y.date, y.endDate)),
+    )
+    if (conflict) fail('sessions', 'review.errors.sessionConflict')
+
+    // ── Step 3: merchandise with sizes selected but no size chosen ──
+    // One issue per offending item (path `addons.<id>`) so each card can show
+    // its own inline error, not just the aggregate banner line.
+    for (const a of addons) {
+      if (a.sizes?.length && v.addons[a.id]?.quantity > 0 && !v.addons[a.id].size) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['addons', a.id],
+          message: 'review.errors.addonSize',
         })
       }
     }
-  }
-
-  // ── Step 3: merchandise with sizes selected but no size chosen ──
-  for (const addon of addons) {
-    if (!addon.sizes?.length) continue
-    const sel = state.addons[addon.id]
-    if (sel && sel.quantity > 0 && !sel.size) {
-      push(3, `size:${addon.id}`, 'review.errors.addonSize', { name: addon.name })
-    }
-  }
-
-  // Index issues by field (first wins) and by step for the view layer.
-  const fields = {}
-  const stepHasError = { 1: false, 2: false, 3: false }
-  for (const issue of issues) {
-    if (!fields[issue.field]) {
-      fields[issue.field] = { messageKey: issue.messageKey, params: issue.params }
-    }
-    stepHasError[issue.step] = true
-  }
-
-  return { issues, fields, stepHasError, hasErrors: issues.length > 0 }
-}
+  })

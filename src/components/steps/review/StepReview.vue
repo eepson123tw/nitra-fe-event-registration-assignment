@@ -25,12 +25,20 @@ const stepHasError = computed(() => validation.value.stepHasError)
 // The banner only appears once a submit has been attempted.
 const showErrors = computed(() => state.validationAttempted && validation.value.hasErrors)
 // Each issue carries the step it belongs to, surfaced as "Step N: <message>".
-const bannerIssues = computed(() =>
-  validation.value.issues.map((i) => ({
-    step: i.step,
-    text: t(i.messageKey, i.params ?? {}),
-  })),
-)
+// Deduped by (step + text) so several same-message issues (e.g. two
+// merchandise items missing a size) collapse to a single banner line.
+const bannerIssues = computed(() => {
+  const seen = new Set()
+  const out = []
+  for (const i of validation.value.issues) {
+    const text = t(i.messageKey, i.params ?? {})
+    const key = `${i.step}|${text}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push({ step: i.step, text })
+  }
+  return out
+})
 
 const ticketValue = computed(() => {
   const tk = event.ticketTypes.find((x) => x.id === state.ticketTypeId)
@@ -83,8 +91,10 @@ const addonRows = computed(() => {
          only after a submit attempt -->
     <div
       v-if="showErrors"
+      id="review-error-banner"
       role="alert"
-      class="flex flex-col gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-4 text-danger"
+      tabindex="-1"
+      class="flex flex-col gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-4 text-danger outline-none"
     >
       <p class="m-0 text-sm font-medium">{{ $t('review.banner.title') }}</p>
       <ul class="m-0 flex list-none flex-col gap-2 p-0">
