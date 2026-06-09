@@ -21,8 +21,8 @@ function stateOf(index, current) {
 </script>
 
 <template>
-  <nav class="bg-surface-l0 q-px-md" style="border-bottom: 1px solid var(--divider-default)">
-    <ol class="row no-wrap items-center q-mx-auto q-py-lg" style="max-width: 1200px; margin-top: 0; margin-bottom: 0">
+  <nav class="bg-surface-l0 q-px-md divider-b">
+    <ol class="row no-wrap items-center q-py-lg wizard-shell my-0">
       <li
         v-for="(step, i) in steps"
         :key="step.key"
@@ -45,21 +45,24 @@ function stateOf(index, current) {
             <q-icon v-if="stateOf(i + 1, current) === 'done'" name="check" size="18px" />
             <template v-else>{{ i + 1 }}</template>
           </span>
-          <!-- Label -->
+          <!-- Label: done + active share the selected (dark) style; only
+               upcoming steps stay muted. -->
           <span
             class="q-ml-sm text-md whitespace-nowrap"
-            :class="stateOf(i + 1, current) === 'active'
-              ? 'font-semibold text-neutral'
-              : 'font-medium text-neutral-quiet'"
+            :class="stateOf(i + 1, current) === 'upcoming'
+              ? 'font-medium text-neutral-quiet'
+              : 'font-semibold text-neutral'"
           >
             {{ step.label }}
           </span>
         </button>
-        <!-- Connector: a flat 2px surface-L2 line (Figma uses one color for all) -->
+        <!-- Connector: 2px line; turns brand-coloured once its preceding step
+             is completed, otherwise stays a muted surface-L2 line. -->
         <span
           v-if="i < steps.length - 1"
-          class="col-grow q-mx-md bg-surface-l2"
+          class="col-grow q-mx-md"
           style="height: 2px; border-radius: 1px"
+          :class="i + 1 < current ? 'bg-brand-emphasis-rest' : 'bg-surface-l2'"
         />
       </li>
     </ol>
