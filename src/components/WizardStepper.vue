@@ -45,8 +45,7 @@ const items = computed(() =>
         >
           <!-- Circle -->
           <span
-            class="flex flex-center text-md font-semibold rounded-full"
-            style="width: 32px; height: 32px"
+            class="flex flex-center h-8 w-8 text-md font-semibold rounded-full"
             :class="item.upcoming
               ? 'bg-surface-l2 text-neutral-quiet'
               : 'bg-brand-emphasis-rest text-inverse'"
@@ -72,8 +71,7 @@ const items = computed(() =>
              is completed, otherwise stays a muted surface-L2 line. -->
         <span
           v-if="!item.isLast"
-          class="step-connector col-grow q-mx-md"
-          style="height: 2px; border-radius: 1px"
+          class="step-connector col-grow q-mx-md h-0.5 rounded-[1px]"
           :class="item.done ? 'bg-brand-emphasis-rest' : 'bg-surface-l2'"
         />
       </li>
