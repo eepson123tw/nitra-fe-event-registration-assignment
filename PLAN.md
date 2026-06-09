@@ -41,7 +41,7 @@ Pricing totals, VIP discounts, time conflicts, capacity/availability flags, and 
 Vue 3.5 (repo pins 3.5.17) supports `defineModel`, so two-way-bound field components use it instead of manual `modelValue` + `update:modelValue`.
 
 **Component decomposition.**
-Step containers (`StepAttendeeInfo`, `StepSessionSelection`, `StepAddons`, `StepReview`) compose small presentational components (`TicketCard`, `SessionCard`, `AddonCard`, `OrderSummary`, `QuantityPicker`, `SizeSelector`, `SuccessScreen`). Business logic lives in composables (`usePricing`, `useConflicts`, `useValidation`) and pure utils (`utils/datetime`, `utils/currency`) — kept out of components so it's readable and testable.
+Step containers (`StepAttendeeInfo`, `StepSessionSelection`, `StepAddons`, `StepReview`) compose small presentational components (`TicketCard`, `SessionCard`, `AddonCard`, `MerchandiseCard`, `OrderSummary`, `QuantityPicker`, `ReviewSection`, `SuccessScreen`). Business logic lives in **pure, dependency-free utils** (`utils/pricing`, `utils/validation`, `utils/datetime`, `utils/currency`) rather than composables — they take state in and return data out, so they're trivially testable and the components stay presentational. The one composable, `useRegistration`, owns *state*, not logic.
 
 **Time-conflict algorithm.**
 Two intervals overlap iff `aStart < bEnd && bStart < aEnd` (compared on epoch millis). One helper serves both session↔session and workshop↔session checks. The mock data ships intentional overlaps (documented in `sessions.js`) to exercise this.
@@ -49,8 +49,8 @@ Two intervals overlap iff `aStart < bEnd && bStart < aEnd` (compared on epoch mi
 **Pricing rules.**
 Grand total = ticket price + Σ add-ons. Workshops get **10% off for VIP** ticket holders; merchandise multiplies price × quantity; sessions are free. All currency rendered as `$X,XXX.XX`.
 
-**Validation strategy.**
-No inline validation before Step 4. On submit, a single `validate()` returns a per-step error map; the stepper shows error badges on the offending step(s) and lets the user jump straight there.
+**Validation strategy — one pure validator, many surfaces.**
+No inline validation runs before Step 4. A single pure `validateRegistration(state)` (`utils/validation.js`) checks every rule across all steps at once — required attendee fields, email/phone format, ticket selection, conditional shipping (when merchandise is selected), session↔session time conflicts, and merchandise-size-not-chosen — and returns issues tagged with a `messageKey` (i18n keys, not strings) and the owning step. The store exposes it once as a shared `computed` (`validation`), so every surface reads the same result: Step 1 shows per-field errors, Step 4 shows the error banner + red section borders, and the stepper marks the offending steps. Everything is gated behind a `validationAttempted` flag that only Step 4's Submit flips — keeping validation deferred per spec while the indicators stay reactive afterwards. On submit, if there are errors the wizard stays on Review and surfaces them in place (banner + clickable Edit links + red stepper steps to jump straight to a problem); if clean, it generates a confirmation number and swaps in the success screen.
 
 **Track badge colours — deterministic, not copied from the mockup.**
 The Figma colours the session-track badges inconsistently: two FRONTEND sessions get different colours (one orange `orange/50`+`orange/600`, one yellow `yellow/200`+`yellow/900`), so there is no per-track rule to copy. I instead assigned one distinct palette colour per track — `main → gray`, `frontend → orange`, `backend → blue`, `devops → yellow` — so the colour actually encodes the track (a blue badge always means backend). Full/disabled sessions mute the badge to gray, matching the design's disabled card. Judgment call: a consistent mapping beats faithfully reproducing the mockup's ad-hoc colouring.
@@ -102,8 +102,7 @@ The most useful thing I did was treat the agent's output as a *draft* and keep p
 
 ## 7. What I'd improve with more time
 
-- **Wire the unified validation.** Step 1's field states (required asterisk, danger label/border/message) are built and gated behind a `validationAttempted` flag, but nothing flips it yet — the Step 4 `validate()` that sets it and surfaces per-step error badges is still to come.
-- **Build Step 4.** The review/submit + success flow and the unified cross-step validation that wires up the deferred session-conflict and required-field checks. (Steps 1–3 are built.)
+- **Persist state.** A page refresh loses the in-progress registration. With more time I'd mirror the store to `sessionStorage` (or the URL) so a reload — or an accidental Edit-link round-trip — keeps the user's selections.
 - **Responsive.** The layout degrades sensibly below 1200px and the stepper collapses its labels, but a real mobile pass (<768px touch-target sizing, denser cards) isn't fully designed or tested — the Figma only ships a 1440 frame.
 - **Tokenise a few arbitraries.** One-offs like `text-[11px]` / `py-[40px]` could become named scale tokens if the design system grows, rather than living as bracket values.
 - **Tests.** Out of scope per the brief, but the pricing and time-conflict logic are the parts I'd most want unit/component tests around before trusting them.
@@ -146,3 +145,14 @@ Workshops / meals / merchandise under an accessible category tablist, beside a l
 
 - **Component organisation.** With three steps' worth of components, each step's container + child components now live under `components/steps/<step>/`, while shared primitives (`AppHeader`, `WizardStepper`, `LabeledInput`, `QuantityPicker`, `OrderSummary`) stay at the components root.
 - AI note / course-correction: the merchandise info banner first used the `text-info` semantic shortcut for its icon, which Quasar's global `.text-info` silently overrode — switched to the `text-blue-500` palette utility (the warning/info names clash with Quasar; success/danger are safe). The Step 2 capacity-bar colour bug had already flagged this class of issue.
+
+**UX — sticky header + stepper.**
+On long steps (the add-ons list, the review page) the stepper used to scroll out of view, so the user lost track of where they were. Wrapped the `AppHeader` + `WizardStepper` in a `sticky top-0 z-10` opaque container so the chrome stays pinned while step content scrolls underneath. Verified the pin holds after scrolling and content passes cleanly behind it.
+
+**Phase 4 — Review & Submit + unified validation.**
+The final step recaps Steps 1–3 in titled `surface-L1` cards (Attendee Information / Selected Sessions / Add-ons), each with an "Edit → Step N" link that jumps back, plus an itemized Pricing Summary (ticket, add-on lines, VIP workshop discount, grand total) — matched pixel-for-pixel to the Figma review frame. Submission, validation and success are wired together:
+- **One pure validator, shared.** `utils/validation.js` validates the whole wizard (required fields, email/phone format, ticket selection, conditional shipping, session time conflicts, missing merchandise size) and returns issues tagged with i18n `messageKey`s + the owning step. The store exposes it as a single shared `computed`, consumed by Step 1 (per-field errors), Step 4 (banner + red section borders + "— (required)" placeholders), and the stepper (red "!" marks on offending steps) — all gated behind `validationAttempted`, which only Submit flips.
+- **Error vs. success flow.** On Submit: if invalid, the wizard stays on Review and surfaces every issue in place (banner + Edit links + red stepper) so the user can jump straight to a problem; if valid, it generates a confirmation number and swaps the wizard for a `SuccessScreen` (green check, confirmation #, thank-you note, order recap, "Back to Home" reset). The header stays; the stepper + footer hide.
+- **Decomposition.** Extracted `ReviewSection` (card chrome + Edit link + danger border) so the three recap sections are data-driven (`computed` row arrays) rather than copy-pasted; pricing reuses the existing pure `buildOrderSummary`. Step navigation reaches Review via a re-emitted `navigate` event, keeping "current step" as local `IndexPage` UI state.
+- Verified end-to-end with Playwright across all three states (review / validation errors / success) — no console errors; the empty-submit path correctly reds Step 1 and lists all six missing-field messages, and a fully-filled VIP path produces the $733.10 grand total and a `TC2025-#####` confirmation.
+- AI note: I had Claude drive the whole flow headlessly (fill → submit-empty → fix → submit) and screenshot each state, rather than trusting a compile-only check — the error/success state transitions are exactly where provide/inject and conditional-render bugs hide.
