@@ -25,7 +25,7 @@ function setLocale(code) {
   <div
     role="group"
     :aria-label="t('app.language')"
-    class="row items-center gap-1 self-center rounded-2 bg-surface-l2 p-1"
+    class="row items-center no-wrap shrink-0 gap-1 self-center rounded-2 bg-surface-l2 p-1"
   >
     <button
       v-for="l in LANGS"
