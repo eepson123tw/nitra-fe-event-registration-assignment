@@ -23,7 +23,7 @@ defineExpose({ focus: () => root.value?.focus() })
     role="radio"
     :aria-checked="selected"
     :tabindex="tabindex"
-    class="flex flex-col gap-3 cursor-pointer p-[20px] transition rounded-[6px] border-2 border-solid outline-none focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]"
+    class="flex flex-col gap-3 cursor-pointer p-5 transition rounded-[6px] border-2 border-solid outline-none focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]"
     :class="selected
       ? 'border-brand-emphasis bg-brand-subtle-rest'
       : 'border-neutral-muted bg-surface-l1 hover:border-brand-muted'"
@@ -48,7 +48,7 @@ defineExpose({ focus: () => root.value?.focus() })
     <!-- Always rendered to reserve its height, so selecting a card never
          reflows the row; hidden until the card is the selected one. -->
     <span
-      class="row items-center self-start px-[8px] py-[3px] rounded-full bg-success-bold-rest text-inverse text-[11px] leading-[14px] font-medium"
+      class="row items-center self-start px-2 py-[3px] rounded-full bg-success-bold-rest text-inverse text-[11px] leading-[14px] font-medium"
       :class="{ invisible: !selected }"
       :aria-hidden="!selected"
     >

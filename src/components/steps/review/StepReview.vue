@@ -81,7 +81,7 @@ const addonRows = computed(() => {
     <div
       v-if="showErrors"
       role="alert"
-      class="flex flex-col gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-[16px]"
+      class="flex flex-col gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-4"
     >
       <div class="flex items-center gap-2">
         <q-icon name="error" size="18px" class="text-danger" />
@@ -162,7 +162,7 @@ const addonRows = computed(() => {
 
     <!-- Pricing Summary (no Edit link — it mirrors the choices above) -->
     <section
-      class="flex flex-col gap-2 rounded-[6px] border border-solid border-neutral-muted bg-surface-l1 p-[20px]"
+      class="flex flex-col gap-2 rounded-[6px] border border-solid border-neutral-muted bg-surface-l1 p-5"
     >
       <h3 class="m-0 text-subtitle1 text-neutral">{{ $t('review.pricing.title') }}</h3>
 

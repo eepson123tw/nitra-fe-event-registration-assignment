@@ -27,7 +27,7 @@ function onSize(e) {
   <div
     role="group"
     :aria-label="addon.name"
-    class="flex flex-col gap-2 p-[16px] rounded-[6px] border-2 border-solid shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]"
+    class="flex flex-col gap-2 p-4 rounded-[6px] border-2 border-solid shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]"
     :class="selected
       ? 'border-brand-emphasis bg-brand-subtle-rest'
       : 'border-neutral-muted bg-surface-l0'"
@@ -46,7 +46,7 @@ function onSize(e) {
           <select
             :value="size"
             :aria-label="$t('addons.size')"
-            class="appearance-none cursor-pointer rounded-[6px] border border-solid border-neutral-muted bg-surface-l0 py-[6px] pl-[12px] pr-[24px] text-sm font-medium text-neutral"
+            class="appearance-none cursor-pointer rounded-[6px] border border-solid border-neutral-muted bg-surface-l0 py-1.5 pl-3 pr-6 text-sm font-medium text-neutral"
             @change="onSize"
           >
             <option value="">{{ $t('addons.selectSize') }}</option>

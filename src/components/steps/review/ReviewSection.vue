@@ -16,7 +16,7 @@ const emit = defineEmits(['navigate'])
 
 <template>
   <section
-    class="flex flex-col gap-3 rounded-[6px] border border-solid bg-surface-l1 p-[20px]"
+    class="flex flex-col gap-3 rounded-[6px] border border-solid bg-surface-l1 p-5"
     :class="hasError ? 'border-danger-emphasis' : 'border-neutral-muted'"
   >
     <header class="flex items-center justify-between gap-4">

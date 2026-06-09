@@ -100,7 +100,7 @@ function restart() {
 
     <!-- Step content (or the confirmation screen once submitted) -->
     <main class="col-grow full-width q-px-md">
-      <div class="wizard-shell py-[40px]">
+      <div class="wizard-shell py-10">
         <SuccessScreen v-if="submitted" :code="confirmationCode" @restart="restart" />
         <component :is="currentComponent" v-else @navigate="goTo" />
       </div>

@@ -105,7 +105,7 @@ function onTabKeydown(e) {
             role="tab"
             :aria-selected="activeCategory === c.key"
             :tabindex="activeCategory === c.key ? 0 : -1"
-            class="cursor-pointer rounded-[8px] border-none px-[20px] py-[8px] text-[13px]"
+            class="cursor-pointer rounded-2 border-none px-5 py-2 text-[13px]"
             :class="activeCategory === c.key
               ? 'bg-brand-emphasis-rest text-inverse font-semibold'
               : 'bg-transparent text-neutral-muted font-medium'"
@@ -115,7 +115,7 @@ function onTabKeydown(e) {
           </button>
         </div>
 
-        <div role="tabpanel" class="flex flex-col gap-4">
+        <div role="tabpanel" class="flex flex-col gap-6">
           <!-- Workshops / Meals: selectable cards -->
           <template v-if="activeCategory !== 'merchandise'">
             <AddonCard
@@ -135,7 +135,7 @@ function onTabKeydown(e) {
             <div
               v-if="anyMerchSelected"
               role="note"
-              class="flex items-start gap-3 rounded-[8px] border border-solid border-info-opacity bg-info-subtle-rest p-[16px]"
+              class="flex items-start gap-3 rounded-2 border border-solid border-info-opacity bg-info-subtle-rest p-4"
             >
               <q-icon name="info" size="20px" class="shrink-0 text-blue-500" />
               <div class="flex min-w-0 flex-1 flex-col gap-1">

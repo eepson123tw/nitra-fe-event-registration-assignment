@@ -72,7 +72,7 @@ function onTabKeydown(e) {
         role="tab"
         :aria-selected="day.key === activeDayKey"
         :tabindex="day.key === activeDayKey ? 0 : -1"
-        class="cursor-pointer rounded-[8px] border-none px-[20px] py-[8px] text-[13px]"
+        class="cursor-pointer rounded-2 border-none px-5 py-2 text-[13px]"
         :class="day.key === activeDayKey
           ? 'bg-brand-emphasis-rest text-inverse font-semibold'
           : 'bg-transparent text-neutral-muted font-medium'"

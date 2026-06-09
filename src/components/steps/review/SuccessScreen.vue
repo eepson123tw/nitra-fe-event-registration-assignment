@@ -17,7 +17,7 @@ const { state } = useRegistration()
 </script>
 
 <template>
-  <section class="flex flex-col items-center gap-6 py-[40px] text-center">
+  <section class="flex flex-col items-center gap-6 py-10 text-center">
     <div class="flex flex-center h-16 w-16 rounded-full bg-success-emphasis-rest">
       <q-icon name="check" size="36px" class="text-inverse" />
     </div>

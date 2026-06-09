@@ -17,7 +17,7 @@ export default {
     attendee: { label: 'Attendee Info' },
     sessions: { label: 'Sessions' },
     addons: { label: 'Add-ons' },
-    review: { label: 'Review & Submit' },
+    review: { label: 'Review' },
   },
   ticket: {
     sectionTitle: 'Select Ticket Type',

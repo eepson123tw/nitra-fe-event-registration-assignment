@@ -11,7 +11,7 @@ const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.leng
 </script>
 
 <template>
-  <aside class="flex flex-col gap-4 rounded-[6px] border border-solid border-neutral-muted bg-surface-l1 p-[24px]">
+  <aside class="flex flex-col gap-4 rounded-[6px] border border-solid border-neutral-muted bg-surface-l1 p-6">
     <h2 class="m-0 text-subtitle1 text-neutral">{{ $t('addons.summary.title') }}</h2>
 
     <div

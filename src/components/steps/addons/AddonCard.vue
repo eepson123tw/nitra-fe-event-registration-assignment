@@ -34,7 +34,7 @@ function toggle() {
     :aria-disabled="disabled"
     :tabindex="disabled ? -1 : 0"
     :aria-label="addon.name"
-    class="flex flex-col gap-2 p-[16px] rounded-[6px] border-2 border-solid outline-none shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)] focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]"
+    class="flex flex-col gap-2 p-4 rounded-[6px] border-2 border-solid outline-none shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)] focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]"
     :class="disabled
       ? 'cursor-not-allowed border-neutral-muted bg-surface-l0'
       : selected

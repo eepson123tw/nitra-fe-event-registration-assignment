@@ -104,7 +104,7 @@ The most useful thing I did was treat the agent's output as a *draft* and keep p
 
 - **Persist state.** A page refresh loses the in-progress registration. With more time I'd mirror the store to `sessionStorage` (or the URL) so a reload — or an accidental Edit-link round-trip — keeps the user's selections.
 - **Responsive.** The layout degrades sensibly below 1200px and the stepper collapses its labels, but a real mobile pass (<768px touch-target sizing, denser cards) isn't fully designed or tested — the Figma only ships a 1440 frame.
-- **Tokenise a few arbitraries.** One-offs like `text-[11px]` / `py-[40px]` could become named scale tokens if the design system grows, rather than living as bracket values.
+- **Tokenise a few arbitraries.** Spacing/radius now uses the numeric step scale (`p-4`, `rounded-2`); the values left in brackets are the genuinely off-scale ones — the 6px card radius (`rounded-[6px]` = the `border-radius/m` token) and small font sizes like `text-[11px]`/`text-[13px]` — which could become named tokens if the design system grows.
 - **Tests.** Out of scope per the brief, but the pricing and time-conflict logic are the parts I'd most want unit/component tests around before trusting them.
 
 ## 8. Phase log
