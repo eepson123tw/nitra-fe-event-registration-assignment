@@ -40,14 +40,18 @@ Grand total = ticket price + Σ add-ons. Workshops get **10% off for VIP** ticke
 **Validation strategy.**
 No inline validation before Step 4. On submit, a single `validate()` returns a per-step error map; the stepper shows error badges on the offending step(s) and lets the user jump straight there.
 
+**Track badge colours — deterministic, not copied from the mockup.**
+The Figma colours the session-track badges inconsistently: two FRONTEND sessions get different colours (one orange `orange/50`+`orange/600`, one yellow `yellow/200`+`yellow/900`), so there is no per-track rule to copy. I instead assigned one distinct palette colour per track — `main → gray`, `frontend → orange`, `backend → blue`, `devops → yellow` — so the colour actually encodes the track (a blue badge always means backend). Full/disabled sessions mute the badge to gray, matching the design's disabled card. Judgment call: a consistent mapping beats faithfully reproducing the mockup's ad-hoc colouring.
+
 ## 3. Dependency choices
+
+The only added runtime dependency is **vue-i18n**.
 
 | Dependency | Problem it solves | Alternatives considered |
 | ---------- | ----------------- | ----------------------- |
-| **date-fns** | Parsing ISO timestamps and formatting human-readable time ranges / day groupings for sessions and workshops. Tree-shakeable, pure-function API that pairs well with `computed`. | Native `Date` + `Intl.DateTimeFormat` (workable but more boilerplate and locale-formatting edge cases); Day.js (smaller but mutable-ish chaining API and weaker tree-shaking). |
 | **vue-i18n** | i18n is a listed nice-to-have; baking it in from the start avoids a costly retrofit of every hardcoded string later. Quasar has first-class integration. | Hand-rolled message map (no pluralization/number-format infra); deferring i18n (rejected — far cheaper to do up front). |
 
-> Currency formatting itself uses the built-in `Intl.NumberFormat` — no dependency needed.
+> **date-fns — evaluated, then removed.** It was added during scaffolding for date handling, but the session/workshop timestamps are fixed UTC ISO strings (`…Z`) and the design renders them as UTC wall-clock times (`09:00Z` → "9:00 AM" for every viewer). `Intl.DateTimeFormat({ timeZone: 'UTC' })` does this correctly in one call, whereas date-fns' `format()` runs in the viewer's local zone — matching the design would have meant adding `date-fns-tz` on top. Time formatting, day-grouping and interval-overlap are all trivial with native `Date`/`Intl` (`src/utils/datetime.js`), so date-fns was removed rather than left as an unused dependency. Currency uses the built-in `Intl.NumberFormat`. **Net added deps: just vue-i18n.**
 
 ## 4. Nice-to-haves (in scope)
 
@@ -87,16 +91,15 @@ The most useful thing I did was treat the agent's output as a *draft* and keep p
 ## 7. What I'd improve with more time
 
 - **Wire the unified validation.** Step 1's field states (required asterisk, danger label/border/message) are built and gated behind a `validationAttempted` flag, but nothing flips it yet — the Step 4 `validate()` that sets it and surfaces per-step error badges is still to come.
-- **Build Steps 2–4.** Session day-grouping + conflict detection, add-ons pricing (VIP workshop discount, qty/size), and the review/submit + success flow.
-- **date-fns is installed but not yet exercised** — it's there for the upcoming session/workshop date parsing and time ranges; right now Step 1 uses none of it.
-- **Responsive.** The layout degrades sensibly below 1200px, but a real mobile pass (<768px single column, touch-target sizing) isn't designed or tested — the Figma only ships a 1440 frame.
+- **Build Steps 3–4.** Add-ons pricing (VIP workshop discount, qty/size) and the review/submit + success flow. (Step 2 — session selection — is now built.)
+- **Responsive.** The layout degrades sensibly below 1200px and the stepper collapses its labels, but a real mobile pass (<768px touch-target sizing, denser cards) isn't fully designed or tested — the Figma only ships a 1440 frame.
 - **Tokenise a few arbitraries.** One-offs like `text-[11px]` / `py-[40px]` could become named scale tokens if the design system grows, rather than living as bracket values.
 - **Tests.** Out of scope per the brief, but the pricing and time-conflict logic are the parts I'd most want unit/component tests around before trusting them.
 
 ## 8. Phase log
 
 **Phase 0 — Scaffold.**
-Added `date-fns` + `vue-i18n`; wired vue-i18n via a Quasar boot file (`src/boot/i18n.js`, Composition mode) with an `en-US` locale registry under `src/i18n/`. Built the central state layer: `useRegistration.js` exposes `provideRegistration()` (called once in `IndexPage`) and `useRegistration()` (injected by steps), with the full typed state shape documented via JSDoc. `IndexPage.vue` hosts a `QStepper` (4 steps, `header-nav` for free forward/backward navigation, Back/Continue/Submit). Four step components are stubbed and rendered. Verified with a clean production build and a dev-server boot (no runtime errors).
+Added `vue-i18n` (and initially `date-fns`, later removed in the Step 2 phase once native `Intl` proved sufficient — see §3); wired vue-i18n via a Quasar boot file (`src/boot/i18n.js`, Composition mode) with an `en-US` locale registry under `src/i18n/`. Built the central state layer: `useRegistration.js` exposes `provideRegistration()` (called once in `IndexPage`) and `useRegistration()` (injected by steps), with the full typed state shape documented via JSDoc. `IndexPage.vue` hosts a `QStepper` (4 steps, `header-nav` for free forward/backward navigation, Back/Continue/Submit). Four step components are stubbed and rendered. Verified with a clean production build and a dev-server boot (no runtime errors).
 
 - AI note: Claude scaffolded the i18n boot, composable, and stepper in one pass. I had it verify both `yarn build` and a real dev boot rather than trusting compile-only — runtime is where boot-file/provide-inject mistakes surface.
 
@@ -116,3 +119,12 @@ A second pass against the Figma box-model annotations tightened Step 1 to spec a
 - **Styling discipline.** Moved one-off `style="…"` attributes onto UnoCSS utilities/shortcuts (`divider-b`/`divider-t` draw the 1px hairline via inset shadow so it never adds to box height; `wizard-shell`, `min-h-screen`, `bg-surface-l0`, `max-w-[1200px]`). Token references only — no hardcoded hex.
 - **Accessibility — ticket picker is a WAI-ARIA radiogroup.** `<button>`-with-block-content was invalid HTML, and a single-select group is semantically a radiogroup, so the cards became `role="radio"` (inside `role="radiogroup"` labelled by the heading) with `aria-checked`, roving `tabindex`, arrow-key navigation with wraparound, Enter/Space select, and a `focus-visible` ring.
 - AI notes / course-corrections (logged because they show where I steered the agent): (1) Claude first bumped the unselected border to 2px to kill a reflow — I flagged Figma's 1px; we kept a constant-width border and reserved badge space instead. (2) It reached for inline `style` for the dividers and the 1200 width — I pushed it back onto the token/shortcut system. (3) It hardcoded the stepper height at 80px — corrected to derive it from padding. (4) It used `<button>` for the cards — I asked why; it confirmed the validity/semantics problem and refactored to a radiogroup. Recurring lesson: verify the rendered result (measure padding, check roles/tabindex), and prefer the system primitive over a one-off.
+
+**Phase 2 — Session Selection.**
+Sessions grouped by day (`Nov 15` / `Nov 16`) behind an accessible day **tablist** (roving `tabindex` + arrow keys). Each `SessionCard` is a multi-select `role="checkbox"` (aria-checked, Space/Enter, focus-visible ring) showing a track badge, speaker, time range, a capacity bar and remaining spots. Capacity-full sessions (`registered >= capacity`, e.g. s2/s9) are disabled — gray, no checkbox, "Sold Out". Time-conflict detection is **deferred to Step 4** per the brief (free multi-select here), with the shared `intervalsOverlap()` helper already in `utils/datetime.js`. A live, pluralised "{n} sessions selected" count (incl. a zero form) sits above the grid.
+
+- **Native `Intl` over date-fns.** Timestamps are fixed UTC ISO and the design shows UTC wall-clock times, so `Intl.DateTimeFormat({ timeZone: 'UTC' })` formats them correctly in one call; date-fns' `format()` is local-zone and would have needed `date-fns-tz`. date-fns was removed (see §3) rather than left unused.
+- **Capacity colour tiers.** Reverse-engineered from the Figma samples: full → danger red, ≥75% → orange, ≥50% → yellow-800, <50% → brand — applied to both the bar and the spots label.
+- **`full` = disabled, data-driven.** The mockup greyed an arbitrary *non-full* card (s5) as a sample; I bind the disabled state to the data (`registered >= capacity`), so the genuinely-full s2/s9 are disabled while s5 stays selectable.
+- **Track badge colours — deterministic** (one distinct palette colour per track, badge greyed when disabled) — see §2.
+- AI notes / course-corrections: (1) the capacity bar and its label rendered as *different* colours — root cause was Quasar's global `.text-warning` overriding the UnoCSS `text-warning` shortcut; switched to the `text-yellow-800` palette utility. (2) The active day tab had a transparent background — a static `bg-transparent` was beating the conditional `bg-brand-emphasis-rest`; moved the background into the conditional. (3) Caught several static `style="…"` dimensions and converted them to UnoCSS utilities (`h-4 w-4`, `h-1.5`, `h-[72px]`…), keeping `:style` only for the runtime capacity-bar width. Recurring lesson: verify computed values (colour/size), and watch for Quasar-vs-UnoCSS class-name collisions.
