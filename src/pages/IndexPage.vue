@@ -50,30 +50,30 @@ function onSubmit() {
 </script>
 
 <template>
-  <div class="flex flex-col" style="min-height: 100vh; background: var(--bg-surface-l0)">
+  <div class="flex flex-col min-h-screen bg-surface-l0">
     <AppHeader />
     <WizardStepper :steps="steps" :current="current" @navigate="goTo" />
 
     <!-- Step content -->
     <main class="col-grow full-width q-px-md">
-      <div class="q-mx-auto py-[40px]" style="max-width: 1200px">
+      <div class="wizard-shell py-[40px]">
         <component :is="currentComponent" />
       </div>
     </main>
 
     <!-- Footer navigation -->
-    <footer class="bg-surface-l0 q-px-md" style="border-top: 1px solid var(--divider-default)">
+    <footer class="bg-surface-l0 q-px-md divider-t">
       <div
-        class="row items-center q-mx-auto q-py-md"
+        class="row items-center q-py-md wizard-shell"
         :class="isFirstStep ? 'justify-end' : 'justify-between'"
-        style="max-width: 1200px"
       >
         <q-btn
           v-if="!isFirstStep"
-          flat
+          unelevated
           no-caps
           :label="$t('nav.back')"
-          class="text-md font-medium text-neutral"
+          padding="10px 16px"
+          class="bg-surface-l2 rounded-[10px] text-md font-medium text-neutral"
           @click="goBack"
         />
         <q-btn
@@ -82,7 +82,8 @@ function onSubmit() {
           no-caps
           color="accent"
           :label="nextLabel"
-          class="q-px-lg q-py-sm rounded-[10px] text-md font-semibold"
+          padding="10px 16px"
+          class="rounded-[10px] text-md font-semibold"
           @click="goNext"
         />
         <q-btn
@@ -91,7 +92,8 @@ function onSubmit() {
           no-caps
           color="accent"
           :label="$t('nav.submit')"
-          class="q-px-lg q-py-sm rounded-[10px] text-md font-semibold"
+          padding="10px 16px"
+          class="rounded-[10px] text-md font-semibold"
           @click="onSubmit"
         />
       </div>
