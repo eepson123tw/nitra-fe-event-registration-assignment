@@ -16,11 +16,11 @@ const emit = defineEmits(['navigate'])
 
 <template>
   <section
-    class="flex flex-col gap-3 rounded-[6px] border border-solid bg-surface-l1 p-5"
-    :class="hasError ? 'border-danger-emphasis' : 'border-neutral-muted'"
+    class="flex flex-col gap-3 rounded-[6px] border-solid bg-surface-l1 p-5"
+    :class="hasError ? 'border-2 border-danger-emphasis' : 'border border-neutral-muted'"
   >
     <header class="flex items-center justify-between gap-4">
-      <h3 class="m-0 text-subtitle1 text-neutral">{{ title }}</h3>
+      <h3 class="m-0 text-subtitle1" :class="hasError ? 'text-danger' : 'text-neutral'">{{ title }}</h3>
       <button
         type="button"
         class="shrink-0 cursor-pointer border-none bg-transparent p-0 text-[12px] font-semibold leading-[16px] text-teal-500 underline"

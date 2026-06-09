@@ -76,7 +76,9 @@ export default {
     title: 'Review Your Registration',
     edit: 'Edit → Step {step}',
     banner: {
-      title: 'Please fix the following before submitting',
+      title: 'Please fix the following errors before submitting',
+      // Each issue is shown as "Step N: <message>"; the validator supplies both.
+      line: 'Step {step}: {message}',
     },
     required: '— (required)',
     notSelected: 'Not selected',
@@ -113,7 +115,7 @@ export default {
       fullName: 'Full name is required',
       emailRequired: 'Email is required',
       emailInvalid: 'Enter a valid email address',
-      phoneRequired: 'Phone is required',
+      phoneRequired: 'Phone number is required',
       phoneInvalid: 'Enter a valid phone number',
       company: 'Company is required',
       jobTitle: 'Job title is required',

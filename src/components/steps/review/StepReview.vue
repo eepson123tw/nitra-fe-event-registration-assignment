@@ -24,8 +24,12 @@ const summary = computed(() => buildOrderSummary(state))
 const stepHasError = computed(() => validation.value.stepHasError)
 // The banner only appears once a submit has been attempted.
 const showErrors = computed(() => state.validationAttempted && validation.value.hasErrors)
+// Each issue carries the step it belongs to, surfaced as "Step N: <message>".
 const bannerIssues = computed(() =>
-  validation.value.issues.map((i) => t(i.messageKey, i.params ?? {})),
+  validation.value.issues.map((i) => ({
+    step: i.step,
+    text: t(i.messageKey, i.params ?? {}),
+  })),
 )
 
 const ticketValue = computed(() => {
@@ -75,28 +79,22 @@ const addonRows = computed(() => {
 
 <template>
   <section class="flex flex-col gap-6">
-    <h2 class="q-my-none text-h3 font-bold text-neutral">{{ $t('review.title') }}</h2>
-
-    <!-- Validation summary: every unmet rule, surfaced after a submit attempt -->
+    <!-- Validation summary sits above the heading (per the design), surfaced
+         only after a submit attempt -->
     <div
       v-if="showErrors"
       role="alert"
-      class="flex flex-col gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-4"
+      class="flex flex-col gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-4 text-danger"
     >
-      <div class="flex items-center gap-2">
-        <q-icon name="error" size="18px" class="text-danger" />
-        <p class="m-0 text-md font-semibold text-danger">{{ $t('review.banner.title') }}</p>
-      </div>
-      <ul class="m-0 flex flex-col gap-1 pl-[26px]">
-        <li
-          v-for="(msg, i) in bannerIssues"
-          :key="i"
-          class="text-[12px] leading-[16px] text-danger"
-        >
-          {{ msg }}
+      <p class="m-0 text-sm font-medium">{{ $t('review.banner.title') }}</p>
+      <ul class="m-0 flex list-none flex-col gap-2 p-0">
+        <li v-for="(item, i) in bannerIssues" :key="i" class="text-sm font-regular">
+          • {{ $t('review.banner.line', { step: item.step, message: item.text }) }}
         </li>
       </ul>
     </div>
+
+    <h2 class="q-my-none text-h3 font-bold text-neutral">{{ $t('review.title') }}</h2>
 
     <!-- Attendee Information -->
     <ReviewSection
