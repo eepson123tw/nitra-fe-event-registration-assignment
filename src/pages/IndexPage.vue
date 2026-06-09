@@ -39,6 +39,12 @@ const errorSteps = computed(() =>
     ? [1, 2, 3].filter((s) => validation.value.stepHasError[s])
     : [],
 )
+// Submit stays enabled for the first attempt (so it can reveal the errors);
+// once errors are showing, it's disabled until they're all resolved (the
+// post-attempt watch keeps validity live as the user fixes fields).
+const submitDisabled = computed(
+  () => state.validationAttempted && validation.value.hasErrors,
+)
 const currentDef = computed(() => stepDefs[current.value - 1])
 const currentComponent = computed(() => currentDef.value.component)
 const isFirstStep = computed(() => current.value === 1)
@@ -152,6 +158,7 @@ function restart() {
           no-caps
           color="accent"
           :label="$t('nav.submit')"
+          :disable="submitDisabled"
           padding="10px 16px"
           class="rounded-[10px] text-md font-semibold"
           @click="onSubmit"
