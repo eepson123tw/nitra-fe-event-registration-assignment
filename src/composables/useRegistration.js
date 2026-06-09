@@ -34,6 +34,7 @@ import {
  * @property {import('vue').ComputedRef<{ issues: object[], fields: object, stepHasError: object, hasErrors: boolean }>} validation
  * @property {() => Promise<{ valid: boolean, errors: object }>} validateAll  Runs the schema over the whole store.
  * @property {() => void} resetValidation  Clears validation errors + form state.
+ * @property {() => void} reset  Resets the whole store to its initial state.
  */
 
 /**
@@ -69,11 +70,12 @@ function buildValidation(errors) {
 export const REGISTRATION_KEY = Symbol('registration')
 
 /**
- * Create the initial, empty wizard state.
+ * The initial, empty wizard state — single source for both the reactive store
+ * and `reset()`, so they can't drift.
  * @returns {RegistrationState}
  */
-function createState() {
-  return reactive({
+function initialState() {
+  return {
     attendee: {
       fullName: '',
       email: '',
@@ -86,7 +88,7 @@ function createState() {
     selectedSessionIds: [],
     addons: {},
     validationAttempted: false,
-  })
+  }
 }
 
 /**
@@ -95,7 +97,7 @@ function createState() {
  * @returns {RegistrationStore} the shared store
  */
 export function provideRegistration() {
-  const state = createState()
+  const state = reactive(initialState())
 
   // vee-validate owns the validation run; the zod schema is the rule source.
   // Inputs stay bound to the store (not to vee-validate fields), so we feed the
@@ -112,7 +114,10 @@ export function provideRegistration() {
   }
 
   // After the first submit attempt, re-validate as the user edits so errors
-  // clear (and reappear) live — validation stays deferred until then.
+  // clear (and reappear) live — validation stays deferred until then. `deep` is
+  // required: toFormValues() reads `selectedSessionIds`/`addons` as references,
+  // so without it, in-place session/add-on mutations wouldn't re-trigger. The
+  // run is cheap for this dataset (a debounce would be the next step at scale).
   watch(
     () => toFormValues(state),
     () => {
@@ -141,9 +146,16 @@ export function provideRegistration() {
     form.resetForm()
   }
 
+  // Reset the whole store to a clean slate for a fresh registration. Reuses
+  // initialState() so the empty shape lives in exactly one place.
+  function reset() {
+    Object.assign(state, initialState())
+    resetValidation()
+  }
+
   const validation = computed(() => buildValidation(errorMap.value))
   /** @type {RegistrationStore} */
-  const store = { state, validation, validateAll, resetValidation }
+  const store = { state, validation, validateAll, resetValidation, reset }
   provide(REGISTRATION_KEY, store)
   return store
 }

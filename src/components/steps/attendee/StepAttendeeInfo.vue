@@ -2,9 +2,9 @@
 // Step 1 — Attendee Info: ticket type selection + attendee form.
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { addons } from '../../../mocks/addons.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
 import { useCatalog } from '../../../composables/useCatalog.js'
+import { hasMerchandiseSelected } from '../../../utils/validation.js'
 import TicketCard from './TicketCard.vue'
 import LabeledInput from '../../LabeledInput.vue'
 
@@ -48,13 +48,9 @@ function onTicketKeydown(e) {
   cardRefs.value[next]?.focus()
 }
 
-// Selecting any merchandise add-on makes the shipping address required.
-const merchandiseIds = new Set(
-  addons.filter((a) => a.category === 'merchandise').map((a) => a.id),
-)
-const requiresShipping = computed(() =>
-  Object.entries(state.addons).some(([id, sel]) => merchandiseIds.has(id) && sel.quantity > 0),
-)
+// Selecting any merchandise add-on makes the shipping address required (shared
+// with the validator so the asterisk and the rule can't drift).
+const requiresShipping = computed(() => hasMerchandiseSelected(state))
 </script>
 
 <template>

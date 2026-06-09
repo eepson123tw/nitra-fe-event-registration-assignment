@@ -31,7 +31,7 @@ function onSize(e) {
   <div
     role="group"
     :aria-label="addon.name"
-    class="flex flex-col gap-2 p-4 rounded-[6px] border-2 border-solid transition-colors duration-150 shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]"
+    class="flex flex-col gap-2 p-4 rounded-[6px] border-2 border-solid transition-colors duration-150 shadow-card"
     :class="selected
       ? 'border-brand-emphasis bg-brand-subtle-rest'
       : 'border-neutral-muted bg-surface-l0'"
@@ -51,7 +51,7 @@ function onSize(e) {
             :value="size"
             :aria-label="$t('addons.size')"
             :aria-invalid="!!error"
-            class="appearance-none cursor-pointer rounded-[6px] border border-solid bg-surface-l0 py-1.5 pl-3 pr-6 text-sm font-medium text-neutral"
+            class="appearance-none cursor-pointer rounded-[6px] border border-solid bg-surface-l0 py-1.5 pl-3 pr-6 text-sm font-medium text-neutral outline-none focus-ring"
             :class="error ? 'border-danger-emphasis' : 'border-neutral-muted'"
             @change="onSize"
           >

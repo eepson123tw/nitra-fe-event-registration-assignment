@@ -47,7 +47,7 @@ const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.leng
 
     <p v-if="isEmpty" class="m-0 text-sm text-neutral-quiet">{{ $t('addons.summary.empty') }}</p>
 
-    <div class="h-px full-width bg-[var(--divider-muted)]" />
+    <div class="divider-line" />
 
     <div class="row items-start justify-between full-width text-sm font-medium text-neutral">
       <span>{{ $t('addons.summary.total') }}</span>

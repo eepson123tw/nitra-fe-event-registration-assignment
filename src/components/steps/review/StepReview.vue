@@ -203,7 +203,7 @@ const addonRows = computed(() => {
         <span>-{{ currency(summary.discount) }}</span>
       </div>
 
-      <div class="h-px w-full bg-[var(--divider-muted)]" />
+      <div class="divider-line" />
 
       <div
         class="flex items-start justify-between gap-4 text-[12px] font-medium leading-[16px] text-neutral"

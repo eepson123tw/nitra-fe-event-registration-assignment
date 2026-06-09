@@ -25,7 +25,7 @@ defineExpose({ focus: () => root.value?.focus() })
     role="radio"
     :aria-checked="selected"
     :tabindex="tabindex"
-    class="flex flex-col gap-3 cursor-pointer p-5 transition rounded-[6px] border-2 border-solid outline-none focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]"
+    class="flex flex-col gap-3 cursor-pointer p-5 transition-colors duration-150 rounded-[6px] border-2 border-solid outline-none focus-ring"
     :class="selected
       ? 'border-brand-emphasis bg-brand-subtle-rest'
       : 'border-neutral-muted bg-surface-l1 hover:border-brand-muted'"

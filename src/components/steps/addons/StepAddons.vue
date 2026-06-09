@@ -64,6 +64,12 @@ function statusFor(addon) {
   return { text: t('addons.spotsRemaining', { count: remaining }, remaining), tone: 'quiet', disabled: false }
 }
 
+// Per-card status computed once each (not re-evaluated 3× per card in the
+// template's :disabled / :status / :status-tone bindings).
+const cardStatus = computed(() =>
+  Object.fromEntries(addons.value.map((a) => [a.id, statusFor(a)])),
+)
+
 function toggleAddon(id) {
   if (state.addons[id]) delete state.addons[id]
   else state.addons[id] = { quantity: 1, size: null }
@@ -143,9 +149,9 @@ function onTabKeydown(e) {
               :key="a.id"
               :addon="a"
               :selected="isSelected(a.id)"
-              :disabled="statusFor(a).disabled"
-              :status="statusFor(a).text"
-              :status-tone="statusFor(a).tone"
+              :disabled="cardStatus[a.id].disabled"
+              :status="cardStatus[a.id].text"
+              :status-tone="cardStatus[a.id].tone"
               @toggle="toggleAddon"
             />
           </template>

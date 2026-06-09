@@ -44,7 +44,9 @@ const items = computed(() =>
       >
         <button
           type="button"
-          class="row items-center no-wrap bg-transparent border-none cursor-pointer q-pa-none"
+          class="row items-center no-wrap bg-transparent border-none cursor-pointer q-pa-none rounded-[6px] outline-none focus-ring"
+          :aria-current="item.active ? 'step' : undefined"
+          :aria-label="item.label"
           @click="emit('navigate', item.index)"
         >
           <!-- Circle: an errored step turns danger-red with a "!"; otherwise

@@ -13,6 +13,14 @@ import { addons } from '../mocks/addons.js'
  *
  * Returns reactive computeds, so the whole UI re-localizes when the locale
  * changes. Ids, prices, dates, capacities are never touched here.
+ *
+ * @returns {{
+ *   event: object,
+ *   ticketTypes: import('vue').ComputedRef<object[]>,
+ *   sessions: import('vue').ComputedRef<object[]>,
+ *   addons: import('vue').ComputedRef<object[]>,
+ *   trackLabel: (track: string) => string,
+ * }}
  */
 export function useCatalog() {
   const { locale, getLocaleMessage } = useI18n({ useScope: 'global' })

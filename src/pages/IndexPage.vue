@@ -13,7 +13,16 @@ import SuccessScreen from '../components/steps/review/SuccessScreen.vue'
 const { t } = useI18n()
 
 // Create + provide the shared wizard state for all steps.
-const { state, validation, validateAll, resetValidation } = provideRegistration()
+const { state, validation, validateAll, reset } = provideRegistration()
+
+// Focus target moved into on each step change, so keyboard/SR users land in the
+// new step instead of at the top of the document.
+const stepRegion = ref(null)
+function focusStep() {
+  stepRegion.value?.focus()
+}
+const prefersReducedMotion = () =>
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
 
 // Step registry: order drives the stepper, the rendered component, and the
 // "next" button label. `nextLabel` is null on the final step (shows submit).
@@ -71,7 +80,7 @@ async function onSubmit() {
     // the bottom of a long page. Bring the banner into view (and focus it for
     // screen readers) so the validation result is obvious, not silent.
     nextTick(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
       document.getElementById('review-error-banner')?.focus({ preventScroll: true })
     })
     return
@@ -81,20 +90,8 @@ async function onSubmit() {
 }
 
 function restart() {
-  // Reset to a clean wizard for a fresh registration.
-  Object.assign(state.attendee, {
-    fullName: '',
-    email: '',
-    phone: '',
-    company: '',
-    jobTitle: '',
-    shippingAddress: '',
-  })
-  state.ticketTypeId = null
-  state.selectedSessionIds = []
-  state.addons = {}
-  state.validationAttempted = false
-  resetValidation()
+  // Reset the store + local wizard UI for a fresh registration.
+  reset()
   submitted.value = false
   confirmationCode.value = ''
   current.value = 1
@@ -122,10 +119,11 @@ function restart() {
     </Transition>
 
     <template v-if="!submitted">
-      <!-- Step content (animated on step change) -->
+      <!-- Step content (animated on step change). The wrapper takes focus after
+           each transition so keyboard/SR users land in the new step. -->
       <main class="col-grow full-width q-px-md">
-        <div class="wizard-shell py-10">
-          <Transition name="step" mode="out-in">
+        <div ref="stepRegion" tabindex="-1" class="wizard-shell py-10 outline-none">
+          <Transition name="step" mode="out-in" @after-enter="focusStep">
             <component :is="currentComponent" :key="current" @navigate="goTo" />
           </Transition>
         </div>

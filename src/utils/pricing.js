@@ -13,6 +13,8 @@ export const VIP_WORKSHOP_DISCOUNT = 0.1
  * `catalog` (optional) supplies locale-aware `ticketTypes` + `addons` so the
  * line names come out translated; it falls back to the English mock data.
  * Prices/ids/quantities are identical across locales.
+ * @param {import('../composables/useRegistration.js').RegistrationState} state  Current wizard state.
+ * @param {{ ticketTypes?: object[], addons?: object[] }} [catalog]  Locale-aware catalog; defaults to the English mocks.
  * @returns {{
  *   ticket: { name: string, amount: number } | null,
  *   lines: { id: string, kind: 'workshop'|'meal'|'merchandise', name: string, quantity: number, amount: number }[],
@@ -33,15 +35,22 @@ export function buildOrderSummary(state, catalog = {}) {
   for (const addon of allAddons) {
     const sel = state.addons[addon.id]
     if (!sel || sel.quantity < 1) continue
-    const quantity = addon.category === 'merchandise' ? sel.quantity : 1
+    // Merchandise carries a quantity (clamped to maxQuantity as defence-in-depth
+    // even though the picker already caps it); everything else is a single unit.
+    const quantity =
+      addon.category === 'merchandise'
+        ? Math.min(sel.quantity, addon.maxQuantity ?? Infinity)
+        : 1
     const amount = addon.price * quantity
     lines.push({ id: addon.id, kind: addon.category, name: addon.name, quantity, amount })
     if (addon.category === 'workshop') workshopSubtotal += amount
   }
 
-  const discount = isVip ? workshopSubtotal * VIP_WORKSHOP_DISCOUNT : 0
   const ticketAmount = ticket ? ticket.price : 0
-  const total = ticketAmount + lines.reduce((sum, l) => sum + l.amount, 0) - discount
+  // Round monetary outputs to cents so the returned numbers (not just their
+  // formatted display) are free of binary-float dust (e.g. 32.800000000000004).
+  const discount = round2(isVip ? workshopSubtotal * VIP_WORKSHOP_DISCOUNT : 0)
+  const total = round2(ticketAmount + lines.reduce((sum, l) => sum + l.amount, 0) - discount)
 
   return {
     ticket: ticket ? { name: ticket.name, amount: ticket.price } : null,
@@ -49,4 +58,9 @@ export function buildOrderSummary(state, catalog = {}) {
     discount,
     total,
   }
+}
+
+/** Round to 2 decimal places (cents). */
+function round2(n) {
+  return Math.round(n * 100) / 100
 }

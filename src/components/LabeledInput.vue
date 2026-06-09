@@ -1,6 +1,11 @@
 <script setup>
 // Labeled text input with two-way binding via defineModel (Vue 3.4+).
+import { useId } from 'vue'
+
 const model = defineModel({ type: String, default: '' })
+
+// Stable id so the error message can be linked to the input for assistive tech.
+const errorId = useId()
 
 defineProps({
   label: { type: String, required: true },
@@ -27,11 +32,13 @@ defineProps({
       :type="type"
       :placeholder="placeholder"
       :error="!!error"
+      :aria-invalid="error ? 'true' : undefined"
+      :aria-describedby="error ? errorId : undefined"
       outlined
       dense
       hide-bottom-space
       no-error-icon
     />
-    <span v-if="error" class="text-sm text-danger">{{ error }}</span>
+    <span v-if="error" :id="errorId" class="text-sm text-danger">{{ error }}</span>
   </div>
 </template>

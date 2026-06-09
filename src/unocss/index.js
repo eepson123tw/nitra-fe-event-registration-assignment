@@ -37,6 +37,14 @@ export const typographyShortcuts = [{
 export const layoutShortcuts = [{
   // Centered content column shared by the stepper, main content and footer.
   'wizard-shell': 'mx-auto max-w-[1200px]',
+  // Card elevation — defined once here (design-system layer) so components
+  // don't repeat the raw shadow values.
+  'shadow-card': 'shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]',
+  // Keyboard focus ring (2px brand) — one definition instead of repeating the
+  // var() shadow in every focusable card/button. Pair with `outline-none`.
+  'focus-ring': 'focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]',
+  // 1px full-width separator line used inside the summary cards.
+  'divider-line': 'h-px w-full bg-[var(--divider-muted)]',
 }]
 
 export const breakpoints = {

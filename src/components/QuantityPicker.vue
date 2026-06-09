@@ -18,7 +18,7 @@ function inc() {
     <span class="text-sm font-medium text-neutral-muted">{{ $t('addons.qty') }}</span>
     <button
       type="button"
-      class="flex flex-center h-7 w-7 cursor-pointer rounded-[6px] border border-solid border-neutral-muted bg-surface-l0 disabled:cursor-not-allowed disabled:opacity-40"
+      class="flex flex-center h-7 w-7 cursor-pointer rounded-[6px] border border-solid border-neutral-muted bg-surface-l0 outline-none focus-ring disabled:cursor-not-allowed disabled:opacity-40"
       :disabled="model <= 0"
       :aria-label="$t('addons.qtyDecrease')"
       @click="dec"
@@ -28,7 +28,7 @@ function inc() {
     <span class="w-6 text-center text-md font-semibold text-neutral" aria-live="polite">{{ model }}</span>
     <button
       type="button"
-      class="flex flex-center h-7 w-7 cursor-pointer rounded-[6px] border border-solid border-neutral-muted bg-surface-l0 disabled:cursor-not-allowed disabled:opacity-40"
+      class="flex flex-center h-7 w-7 cursor-pointer rounded-[6px] border border-solid border-neutral-muted bg-surface-l0 outline-none focus-ring disabled:cursor-not-allowed disabled:opacity-40"
       :disabled="model >= max"
       :aria-label="$t('addons.qtyIncrease')"
       @click="inc"
