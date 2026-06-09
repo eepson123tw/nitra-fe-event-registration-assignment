@@ -55,10 +55,15 @@ const items = computed(() =>
             <template v-else>{{ item.index }}</template>
           </span>
           <!-- Label: done + active share the selected (dark) style; only
-               upcoming steps stay muted. -->
+               upcoming steps stay muted. Below the tablet breakpoint every
+               label except the active one collapses, so the stepper can't
+               overflow on small screens. -->
           <span
-            class="q-ml-sm text-md whitespace-nowrap"
-            :class="item.upcoming ? 'font-medium text-neutral-quiet' : 'font-semibold text-neutral'"
+            class="step-label q-ml-sm text-md whitespace-nowrap"
+            :class="[
+              item.upcoming ? 'font-medium text-neutral-quiet' : 'font-semibold text-neutral',
+              { 'step-label--active': item.active },
+            ]"
           >
             {{ item.label }}
           </span>
@@ -67,7 +72,7 @@ const items = computed(() =>
              is completed, otherwise stays a muted surface-L2 line. -->
         <span
           v-if="!item.isLast"
-          class="col-grow q-mx-md"
+          class="step-connector col-grow q-mx-md"
           style="height: 2px; border-radius: 1px"
           :class="item.done ? 'bg-brand-emphasis-rest' : 'bg-surface-l2'"
         />
@@ -75,3 +80,18 @@ const items = computed(() =>
     </ol>
   </nav>
 </template>
+
+<style scoped>
+/* Below the tablet breakpoint, collapse every label except the active step's
+   so the horizontal stepper can't overflow on small screens. */
+@media (max-width: 767px) {
+  .step-label:not(.step-label--active) {
+    display: none;
+  }
+  /* Tighter connectors so circles + the single active label still fit. */
+  .step-connector {
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+}
+</style>
