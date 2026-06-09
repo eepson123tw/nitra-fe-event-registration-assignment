@@ -72,7 +72,61 @@ export default {
       empty: 'No items selected yet.',
     },
   },
-  common: {
-    comingSoon: 'Coming soon',
+  review: {
+    title: 'Review Your Registration',
+    edit: 'Edit → Step {step}',
+    banner: {
+      title: 'Please fix the following before submitting',
+    },
+    required: '— (required)',
+    notSelected: 'Not selected',
+    sections: {
+      attendee: 'Attendee Information',
+      sessions: 'Selected Sessions',
+      addons: 'Add-ons',
+    },
+    fields: {
+      name: 'Name',
+      email: 'Email',
+      phone: 'Phone',
+      company: 'Company',
+      jobTitle: 'Job Title',
+      ticketType: 'Ticket Type',
+    },
+    empty: {
+      sessions: 'No sessions selected',
+      addons: 'No add-ons selected',
+    },
+    categories: {
+      workshop: 'Workshop',
+      meal: 'Meal Package',
+      merchandise: 'Merchandise',
+    },
+    pricing: {
+      title: 'Pricing Summary',
+      ticket: '{name} Ticket',
+      workshopDiscount: 'Workshop discount (VIP 10%)',
+      total: 'Grand Total',
+    },
+    // Validation messages, keyed from utils/validation.js.
+    errors: {
+      fullName: 'Full name is required',
+      emailRequired: 'Email is required',
+      emailInvalid: 'Enter a valid email address',
+      phoneRequired: 'Phone is required',
+      phoneInvalid: 'Enter a valid phone number',
+      company: 'Company is required',
+      jobTitle: 'Job title is required',
+      ticketType: 'Please select a ticket type',
+      shipping: 'Shipping address is required for merchandise orders',
+      sessionConflict: 'Time conflict: “{a}” overlaps “{b}”',
+      addonSize: 'Please select a size for {name}',
+    },
+  },
+  success: {
+    title: 'Registration Complete!',
+    confirmation: 'Confirmation #{code}',
+    message: 'Thank you for registering for {event}. A confirmation email is on its way to {email}.',
+    backHome: 'Back to Home',
   },
 }

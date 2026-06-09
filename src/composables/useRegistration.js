@@ -1,4 +1,5 @@
-import { reactive, provide, inject } from 'vue'
+import { reactive, computed, provide, inject } from 'vue'
+import { validateRegistration } from '../utils/validation.js'
 
 /**
  * @typedef {Object} AttendeeInfo
@@ -22,6 +23,7 @@ import { reactive, provide, inject } from 'vue'
  *
  * @typedef {Object} RegistrationStore
  * @property {RegistrationState} state
+ * @property {import('vue').ComputedRef<ReturnType<typeof import('../utils/validation.js').validateRegistration>>} validation
  */
 
 /** Injection key for the shared registration store. */
@@ -55,8 +57,11 @@ function createState() {
  */
 export function provideRegistration() {
   const state = createState()
+  // Single shared validation result so every step reads the same source of
+  // truth (field errors in Step 1, the banner + section marks in Step 4).
+  const validation = computed(() => validateRegistration(state))
   /** @type {RegistrationStore} */
-  const store = { state }
+  const store = { state, validation }
   provide(REGISTRATION_KEY, store)
   return store
 }

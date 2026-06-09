@@ -9,7 +9,16 @@ import TicketCard from './TicketCard.vue'
 import LabeledInput from '../../LabeledInput.vue'
 
 const { t } = useI18n()
-const { state } = useRegistration()
+const { state, validation } = useRegistration()
+
+// Field-level errors come from the shared unified validation, but only surface
+// after a submit has been attempted — matching the spec's "no inline
+// validation before Step 4". Returns a translated message, or '' when valid.
+function fieldError(field) {
+  if (!state.validationAttempted) return ''
+  const f = validation.value.fields[field]
+  return f ? t(f.messageKey, f.params ?? {}) : ''
+}
 
 const tickets = event.ticketTypes
 
@@ -46,13 +55,6 @@ const merchandiseIds = new Set(
 const requiresShipping = computed(() =>
   Object.entries(state.addons).some(([id, sel]) => merchandiseIds.has(id) && sel.quantity > 0),
 )
-
-// The error surfaces only after the unified Step 4 validation runs.
-const shippingError = computed(() =>
-  state.validationAttempted && requiresShipping.value && !state.attendee.shippingAddress.trim()
-    ? t('attendee.shippingAddress.required')
-    : '',
-)
 </script>
 
 <template>
@@ -65,6 +67,8 @@ const shippingError = computed(() =>
       <div
         role="radiogroup"
         aria-labelledby="ticket-type-heading"
+        :aria-invalid="!!fieldError('ticketType')"
+        aria-describedby="ticket-type-error"
         class="grid grid-cols-1 gap-4 md:grid-cols-3"
         @keydown="onTicketKeydown"
       >
@@ -78,6 +82,9 @@ const shippingError = computed(() =>
           @select="selectTicket"
         />
       </div>
+      <p v-if="fieldError('ticketType')" id="ticket-type-error" class="m-0 text-md text-danger">
+        {{ fieldError('ticketType') }}
+      </p>
     </div>
 
     <!-- Attendee information: 32px between the heading and the form -->
@@ -90,29 +97,34 @@ const shippingError = computed(() =>
             v-model="state.attendee.fullName"
             :label="$t('attendee.fullName.label')"
             :placeholder="$t('attendee.fullName.placeholder')"
+            :error="fieldError('fullName')"
           />
           <LabeledInput
             v-model="state.attendee.email"
             type="email"
             :label="$t('attendee.email.label')"
             :placeholder="$t('attendee.email.placeholder')"
+            :error="fieldError('email')"
           />
           <LabeledInput
             v-model="state.attendee.phone"
             type="tel"
             :label="$t('attendee.phone.label')"
             :placeholder="$t('attendee.phone.placeholder')"
+            :error="fieldError('phone')"
           />
           <LabeledInput
             v-model="state.attendee.company"
             :label="$t('attendee.company.label')"
             :placeholder="$t('attendee.company.placeholder')"
+            :error="fieldError('company')"
           />
         </div>
         <LabeledInput
           v-model="state.attendee.jobTitle"
           :label="$t('attendee.jobTitle.label')"
           :placeholder="$t('attendee.jobTitle.placeholder')"
+          :error="fieldError('jobTitle')"
         />
         <LabeledInput
           v-model="state.attendee.shippingAddress"
@@ -120,7 +132,7 @@ const shippingError = computed(() =>
           :label-suffix="$t('attendee.shippingAddress.optional')"
           :placeholder="$t('attendee.shippingAddress.placeholder')"
           :required="requiresShipping"
-          :error="shippingError"
+          :error="fieldError('shippingAddress')"
         />
       </div>
     </div>
