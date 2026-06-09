@@ -2,6 +2,7 @@
 export default {
   app: {
     title: 'Event Registration',
+    language: 'Language',
   },
   nav: {
     back: 'Back',
