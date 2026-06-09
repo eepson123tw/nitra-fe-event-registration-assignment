@@ -1,31 +1,42 @@
 <script setup>
+import { ref } from 'vue'
 import { formatCurrency } from '../utils/currency.js'
 
 defineProps({
   /** @type {{ id: string, name: string, price: number, description: string, perks: string[] }} */
   ticket: { type: Object, required: true },
   selected: { type: Boolean, default: false },
+  /** Roving tabindex within the radiogroup: 0 for the active option, -1 otherwise. */
+  tabindex: { type: Number, default: -1 },
 })
 
 const emit = defineEmits(['select'])
+
+// Exposed so the radiogroup parent can move focus during arrow-key navigation.
+const root = ref(null)
+defineExpose({ focus: () => root.value?.focus() })
 </script>
 
 <template>
-  <button
-    type="button"
-    class="flex flex-col gap-3 text-left cursor-pointer p-[20px] transition rounded-[6px] border-2 border-solid "
+  <div
+    ref="root"
+    role="radio"
+    :aria-checked="selected"
+    :tabindex="tabindex"
+    class="flex flex-col gap-3 cursor-pointer p-[20px] transition rounded-[6px] border-2 border-solid outline-none focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]"
     :class="selected
       ? 'border-brand-emphasis bg-brand-subtle-rest'
       : 'border-neutral-muted bg-surface-l1 hover:border-brand-muted'"
-    :aria-pressed="selected"
     @click="emit('select', ticket.id)"
+    @keydown.enter.prevent="emit('select', ticket.id)"
+    @keydown.space.prevent="emit('select', ticket.id)"
   >
     <div class="row items-center justify-between full-width text-subtitle1 text-neutral">
       <span>{{ ticket.name }}</span>
       <span>{{ formatCurrency(ticket.price, { cents: false }) }}</span>
     </div>
 
-    <p class="text-sm text-neutral-muted">{{ ticket.description }}</p>
+    <p class="text-sm text-neutral-muted m-0">{{ ticket.description }}</p>
 
     <ul class="flex flex-col gap-3 full-width q-pl-none q-my-none">
       <li v-for="perk in ticket.perks" :key="perk" class="row items-center no-wrap">
@@ -37,12 +48,12 @@ const emit = defineEmits(['select'])
     <!-- Always rendered to reserve its height, so selecting a card never
          reflows the row; hidden until the card is the selected one. -->
     <span
-      class="row items-center self-start px-[8px] py-[3px] rounded-full bg-success-bold-rest text-inverse text-[11px] font-medium"
+      class="row items-center self-start px-[8px] py-[3px] rounded-full bg-success-bold-rest text-inverse text-[11px] leading-[14px] font-medium"
       :class="{ invisible: !selected }"
       :aria-hidden="!selected"
     >
       <q-icon name="check" size="12px" class="q-mr-xs" />
       {{ $t('ticket.selected') }}
     </span>
-  </button>
+  </div>
 </template>
