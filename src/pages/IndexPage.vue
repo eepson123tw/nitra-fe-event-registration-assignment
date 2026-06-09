@@ -4,10 +4,10 @@ import { useI18n } from 'vue-i18n'
 import { provideRegistration } from '../composables/useRegistration.js'
 import AppHeader from '../components/AppHeader.vue'
 import WizardStepper from '../components/WizardStepper.vue'
-import StepAttendeeInfo from '../components/steps/StepAttendeeInfo.vue'
-import StepSessionSelection from '../components/steps/StepSessionSelection.vue'
-import StepAddons from '../components/steps/StepAddons.vue'
-import StepReview from '../components/steps/StepReview.vue'
+import StepAttendeeInfo from '../components/steps/attendee/StepAttendeeInfo.vue'
+import StepSessionSelection from '../components/steps/sessions/StepSessionSelection.vue'
+import StepAddons from '../components/steps/addons/StepAddons.vue'
+import StepReview from '../components/steps/review/StepReview.vue'
 
 const { t } = useI18n()
 

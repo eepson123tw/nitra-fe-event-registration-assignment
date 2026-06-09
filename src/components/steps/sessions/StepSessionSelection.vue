@@ -3,10 +3,10 @@
 // Time-conflict detection is deferred to Step 4 (no inline blocking here);
 // only capacity-full sessions are disabled.
 import { computed, ref } from 'vue'
-import { sessions } from '../../mocks/sessions.js'
-import { useRegistration } from '../../composables/useRegistration.js'
-import { dayKey, formatDayLabel } from '../../utils/datetime.js'
-import SessionCard from '../SessionCard.vue'
+import { sessions } from '../../../mocks/sessions.js'
+import { useRegistration } from '../../../composables/useRegistration.js'
+import { dayKey, formatDayLabel } from '../../../utils/datetime.js'
+import SessionCard from './SessionCard.vue'
 
 const { state } = useRegistration()
 

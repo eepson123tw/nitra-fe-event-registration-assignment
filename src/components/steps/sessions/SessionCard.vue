@@ -1,7 +1,7 @@
 <script setup>
 // A single selectable session (multi-select). Full sessions are disabled.
 import { computed } from 'vue'
-import { formatTimeRange } from '../utils/datetime.js'
+import { formatTimeRange } from '../../../utils/datetime.js'
 
 const props = defineProps({
   /** @type {{ id, title, speaker, speakerTitle, track, date, endDate, capacity, registered }} */

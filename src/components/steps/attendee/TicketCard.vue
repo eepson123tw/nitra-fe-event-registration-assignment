@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { formatCurrency } from '../utils/currency.js'
+import { formatCurrency } from '../../../utils/currency.js'
 
 defineProps({
   /** @type {{ id: string, name: string, price: number, description: string, perks: string[] }} */

@@ -2,11 +2,11 @@
 // Step 1 — Attendee Info: ticket type selection + attendee form.
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { event } from '../../mocks/event.js'
-import { addons } from '../../mocks/addons.js'
-import { useRegistration } from '../../composables/useRegistration.js'
-import TicketCard from '../TicketCard.vue'
-import LabeledInput from '../LabeledInput.vue'
+import { event } from '../../../mocks/event.js'
+import { addons } from '../../../mocks/addons.js'
+import { useRegistration } from '../../../composables/useRegistration.js'
+import TicketCard from './TicketCard.vue'
+import LabeledInput from '../../LabeledInput.vue'
 
 const { t } = useI18n()
 const { state } = useRegistration()
