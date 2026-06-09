@@ -6,6 +6,7 @@ import {
   toFormValues,
   STEP_BY_FIELD,
   FIELD_ORDER,
+  conflictingSelectedWorkshopIds,
 } from '../utils/validation.js'
 
 /**
@@ -116,6 +117,19 @@ export function provideRegistration() {
     () => toFormValues(state),
     () => {
       if (state.validationAttempted) validateAll()
+    },
+    { deep: true },
+  )
+
+  // Sessions are the primary schedule: when a session selection makes an
+  // already-chosen workshop overlap, that workshop becomes "unavailable" and is
+  // dropped from the order (it can't be in two places at once). This keeps the
+  // invariant "no selected workshop clashes with a selected session" in both
+  // directions — Step 3 prevents adding a clashing one; this prunes the reverse.
+  watch(
+    () => state.selectedSessionIds,
+    () => {
+      for (const id of conflictingSelectedWorkshopIds(state)) delete state.addons[id]
     },
     { deep: true },
   )

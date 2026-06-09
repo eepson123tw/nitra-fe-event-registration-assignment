@@ -7,6 +7,8 @@ const props = defineProps({
   /** @type {{ id, title, speaker, speakerTitle, track, date, endDate, capacity, registered }} */
   session: { type: Object, required: true },
   selected: { type: Boolean, default: false },
+  /** True when this selected session overlaps another selected one (after a submit attempt). */
+  conflict: { type: Boolean, default: false },
 })
 const emit = defineEmits(['toggle'])
 
@@ -61,9 +63,11 @@ function toggle() {
     class="flex flex-col gap-2 p-4 rounded-[6px] border-2 border-solid outline-none shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)] focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]"
     :class="full
       ? 'cursor-not-allowed border-neutral-muted bg-surface-l2'
-      : selected
-        ? 'cursor-pointer border-brand-emphasis bg-brand-subtle-rest'
-        : 'cursor-pointer border-neutral-muted bg-surface-l0 hover:border-brand-muted'"
+      : conflict
+        ? 'cursor-pointer border-danger-emphasis bg-danger-muted-rest'
+        : selected
+          ? 'cursor-pointer border-brand-emphasis bg-brand-subtle-rest'
+          : 'cursor-pointer border-neutral-muted bg-surface-l0 hover:border-brand-muted'"
     @click="toggle"
     @keydown.enter.prevent="toggle"
     @keydown.space.prevent="toggle"
@@ -105,6 +109,15 @@ function toggle() {
     </div>
     <p class="m-0 text-[11px] leading-[14px]" :class="spotsClass[tier]">
       {{ full ? $t('sessions.soldOut') : $t('sessions.spotsLeft', { count: remaining }, remaining) }}
+    </p>
+
+    <!-- Conflict cue: only after a submit attempt, on each overlapping card -->
+    <p
+      v-if="conflict"
+      class="row items-center no-wrap gap-1 m-0 text-[11px] leading-[14px] font-medium text-danger"
+    >
+      <q-icon name="error" size="14px" />
+      {{ $t('sessions.conflict') }}
     </p>
   </div>
 </template>

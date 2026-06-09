@@ -51,3 +51,21 @@ export function intervalsOverlap(aStartISO, aEndISO, bStartISO, bEndISO) {
     Date.parse(bStartISO) < Date.parse(aEndISO)
   )
 }
+
+/**
+ * Given items shaped `{ id, date, endDate }`, return the Set of ids that overlap
+ * at least one other item. Shared by the Step-4 conflict validation and the
+ * Step-2 inline conflict highlighting so the two always agree.
+ */
+export function findOverlappingIds(items) {
+  const ids = new Set()
+  for (let i = 0; i < items.length; i += 1) {
+    for (let j = i + 1; j < items.length; j += 1) {
+      if (intervalsOverlap(items[i].date, items[i].endDate, items[j].date, items[j].endDate)) {
+        ids.add(items[i].id)
+        ids.add(items[j].id)
+      }
+    }
+  }
+  return ids
+}

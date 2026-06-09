@@ -5,10 +5,20 @@
 import { computed, ref } from 'vue'
 import { sessions } from '../../../mocks/sessions.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
-import { dayKey, formatDayLabel } from '../../../utils/datetime.js'
+import { dayKey, formatDayLabel, findOverlappingIds } from '../../../utils/datetime.js'
 import SessionCard from './SessionCard.vue'
 
 const { state } = useRegistration()
+
+// Sessions that overlap another selected one — surfaced only after a submit
+// attempt (validation stays deferred), and recomputed live as the user edits
+// so the cues clear the moment a conflict is resolved. Shares the overlap
+// helper with the Step-4 validator.
+const conflictIds = computed(() => {
+  if (!state.validationAttempted) return new Set()
+  const selected = sessions.filter((s) => state.selectedSessionIds.includes(s.id))
+  return findOverlappingIds(selected)
+})
 
 // Group sessions by day, preserving source order.
 const days = computed(() => {
@@ -86,12 +96,23 @@ function onTabKeydown(e) {
       {{ $t('sessions.selectedCount', { count: selectedCount }, selectedCount) }}
     </p>
 
+    <!-- Conflict notice: points the user at the highlighted cards to fix -->
+    <div
+      v-if="conflictIds.size"
+      role="alert"
+      class="flex items-center gap-2 rounded-[6px] border border-solid border-danger-muted bg-danger-muted-rest p-4 text-danger"
+    >
+      <q-icon name="error" size="18px" />
+      <p class="m-0 text-sm font-medium">{{ $t('sessions.conflictNotice') }}</p>
+    </div>
+
     <div role="tabpanel" class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <SessionCard
         v-for="s in activeDay.sessions"
         :key="s.id"
         :session="s"
         :selected="selectedSet.has(s.id)"
+        :conflict="conflictIds.has(s.id)"
         @toggle="toggle"
       />
     </div>

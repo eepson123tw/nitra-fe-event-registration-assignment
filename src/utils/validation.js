@@ -9,7 +9,7 @@
 import { z } from 'zod'
 import { sessions } from '../mocks/sessions.js'
 import { addons } from '../mocks/addons.js'
-import { intervalsOverlap } from './datetime.js'
+import { intervalsOverlap, findOverlappingIds } from './datetime.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -29,6 +29,28 @@ export function hasMerchandiseSelected(state) {
   return Object.entries(state.addons ?? {}).some(
     ([id, sel]) => MERCH_IDS.has(id) && sel.quantity > 0,
   )
+}
+
+/**
+ * Does a workshop's time slot overlap any session the user has selected?
+ * Sessions are the primary schedule — a workshop that clashes is "unavailable".
+ * Shared by Step 3's availability display and the store's auto-prune.
+ */
+export function workshopConflictsWithSessions(workshop, state) {
+  if (workshop.category !== 'workshop' || !workshop.date) return false
+  return sessions.some(
+    (s) =>
+      state.selectedSessionIds.includes(s.id) &&
+      intervalsOverlap(workshop.date, workshop.endDate, s.date, s.endDate),
+  )
+}
+
+/** Ids of currently-selected workshops that now clash with a selected session. */
+export function conflictingSelectedWorkshopIds(state) {
+  return addons
+    .filter((a) => a.category === 'workshop' && state.addons[a.id]?.quantity > 0)
+    .filter((w) => workshopConflictsWithSessions(w, state))
+    .map((w) => w.id)
 }
 
 /** Maps each schema path to the wizard step it belongs to (drives the stepper + banner). */
@@ -101,10 +123,7 @@ export const registrationSchema = z
 
     // ── Step 2: time conflicts among selected sessions ──
     const selected = sessions.filter((s) => v.sessions.includes(s.id))
-    const conflict = selected.some((x, i) =>
-      selected.slice(i + 1).some((y) => intervalsOverlap(x.date, x.endDate, y.date, y.endDate)),
-    )
-    if (conflict) fail('sessions', 'review.errors.sessionConflict')
+    if (findOverlappingIds(selected).size > 0) fail('sessions', 'review.errors.sessionConflict')
 
     // ── Step 3: merchandise with sizes selected but no size chosen ──
     // One issue per offending item (path `addons.<id>`) so each card can show

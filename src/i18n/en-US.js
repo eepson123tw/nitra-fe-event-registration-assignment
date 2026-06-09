@@ -42,6 +42,8 @@ export default {
     selectedCount: 'No sessions selected | {count} session selected | {count} sessions selected',
     spotsLeft: '{count} spot left | {count} spots left',
     soldOut: 'Sold Out',
+    conflict: 'Overlaps another selected session',
+    conflictNotice: 'Some selected sessions overlap in time — deselect one from each highlighted pair to continue.',
   },
   addons: {
     sectionTitle: 'Select Add-ons',
@@ -53,6 +55,7 @@ export default {
     spotsRemaining: '{count} spot remaining | {count} spots remaining',
     soldOut: 'Sold Out',
     unavailable: 'Unavailable — overlaps a selected session',
+    workshopConflict: 'A workshop overlaps a session you selected in Step 2, so it’s unavailable. Any workshop already added has been removed from your order.',
     added: 'Added to order',
     size: 'Size:',
     selectSize: 'Select',

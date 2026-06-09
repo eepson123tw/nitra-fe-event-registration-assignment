@@ -5,10 +5,8 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { addons } from '../../../mocks/addons.js'
-import { sessions } from '../../../mocks/sessions.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
-import { intervalsOverlap } from '../../../utils/datetime.js'
-import { hasMerchandiseSelected } from '../../../utils/validation.js'
+import { hasMerchandiseSelected, workshopConflictsWithSessions } from '../../../utils/validation.js'
 import AddonCard from './AddonCard.vue'
 import MerchandiseCard from './MerchandiseCard.vue'
 import OrderSummary from '../../OrderSummary.vue'
@@ -36,15 +34,16 @@ const byCategory = computed(() => {
   return map
 })
 
-// Sessions chosen in Step 2 — used to flag workshop time conflicts.
-const selectedSessions = computed(() =>
-  sessions.filter((s) => state.selectedSessionIds.includes(s.id)),
-)
+// A workshop is unavailable when its slot overlaps a session chosen in Step 2
+// (shared rule — the store auto-removes one that becomes conflicting).
 function isWorkshopConflict(addon) {
-  return selectedSessions.value.some((s) =>
-    intervalsOverlap(addon.date, addon.endDate, s.date, s.endDate),
-  )
+  return workshopConflictsWithSessions(addon, state)
 }
+// Any workshop currently unavailable because of a session clash — drives the
+// reminder banner (incl. when an added workshop was just auto-removed).
+const hasWorkshopConflict = computed(() =>
+  byCategory.value.workshop.some((w) => isWorkshopConflict(w)),
+)
 
 function isSelected(id) {
   const sel = state.addons[id]
@@ -125,6 +124,17 @@ function onTabKeydown(e) {
         </div>
 
         <div role="tabpanel" class="flex flex-col gap-6">
+          <!-- Reminder: a workshop overlaps a selected session (any that was
+               already added has been removed from the order automatically). -->
+          <div
+            v-if="activeCategory === 'workshop' && hasWorkshopConflict"
+            role="note"
+            class="flex items-start gap-3 rounded-[8px] border border-solid border-info-opacity bg-info-subtle-rest p-4"
+          >
+            <q-icon name="info" size="20px" class="shrink-0 text-blue-500" />
+            <p class="m-0 min-w-0 flex-1 text-md text-neutral">{{ $t('addons.workshopConflict') }}</p>
+          </div>
+
           <!-- Workshops / Meals: selectable cards -->
           <template v-if="activeCategory !== 'merchandise'">
             <AddonCard
