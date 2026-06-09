@@ -7,37 +7,41 @@
 
 const TZ = 'UTC'
 
-const timeFormat = new Intl.DateTimeFormat('en-US', {
-  hour: 'numeric',
-  minute: '2-digit',
-  timeZone: TZ,
-})
+// Memoize Intl formatters per (locale + kind) — building them is relatively
+// expensive and the set of locales is tiny.
+const cache = new Map()
+function formatter(locale, kind, opts) {
+  const key = `${locale}|${kind}`
+  let f = cache.get(key)
+  if (!f) {
+    f = new Intl.DateTimeFormat(locale, { ...opts, timeZone: TZ })
+    cache.set(key, f)
+  }
+  return f
+}
+const timeFormat = (locale) => formatter(locale, 'time', { hour: 'numeric', minute: '2-digit' })
+const dayLabelFormat = (locale) => formatter(locale, 'day', { month: 'short', day: 'numeric' })
 
-const dayLabelFormat = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  timeZone: TZ,
-})
-
-/** "9:00 AM – 10:00 AM" (en dash), formatted in UTC. */
-export function formatTimeRange(startISO, endISO) {
-  return `${timeFormat.format(new Date(startISO))} – ${timeFormat.format(new Date(endISO))}`
+/** "9:00 AM – 10:00 AM" (en dash), formatted in UTC for the given locale. */
+export function formatTimeRange(startISO, endISO, locale = 'en-US') {
+  const f = timeFormat(locale)
+  return `${f.format(new Date(startISO))} – ${f.format(new Date(endISO))}`
 }
 
 /** Combined day + start time for review rows, e.g. "Nov 15, 9:00 AM". */
-export function formatDayTime(iso) {
+export function formatDayTime(iso, locale = 'en-US') {
   const d = new Date(iso)
-  return `${dayLabelFormat.format(d)}, ${timeFormat.format(d)}`
+  return `${dayLabelFormat(locale).format(d)}, ${timeFormat(locale).format(d)}`
 }
 
-/** Stable day grouping key, e.g. "2028-11-15" (the UTC date part). */
+/** Stable day grouping key, e.g. "2028-11-15" (the UTC date part). Locale-free. */
 export function dayKey(iso) {
   return iso.slice(0, 10)
 }
 
 /** Short day label for tabs, e.g. "Nov 15". */
-export function formatDayLabel(iso) {
-  return dayLabelFormat.format(new Date(iso))
+export function formatDayLabel(iso, locale = 'en-US') {
+  return dayLabelFormat(locale).format(new Date(iso))
 }
 
 /**

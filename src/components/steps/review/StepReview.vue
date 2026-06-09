@@ -5,22 +5,23 @@
 // this component only surfaces state and re-emits "navigate" for Edit links.
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { event } from '../../../mocks/event.js'
-import { sessions } from '../../../mocks/sessions.js'
-import { addons } from '../../../mocks/addons.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
+import { useCatalog } from '../../../composables/useCatalog.js'
+import { useFormat } from '../../../composables/useFormat.js'
 import { hasMerchandiseSelected } from '../../../utils/validation.js'
 import { buildOrderSummary } from '../../../utils/pricing.js'
-import { formatCurrency } from '../../../utils/currency.js'
-import { formatDayTime } from '../../../utils/datetime.js'
 import ReviewSection from './ReviewSection.vue'
 
 const { t } = useI18n()
 const { state, validation } = useRegistration()
+const { ticketTypes, sessions, addons } = useCatalog()
+const { currency, dayTime } = useFormat()
 
 defineEmits(['navigate'])
 
-const summary = computed(() => buildOrderSummary(state))
+const summary = computed(() =>
+  buildOrderSummary(state, { ticketTypes: ticketTypes.value, addons: addons.value }),
+)
 const stepHasError = computed(() => validation.value.stepHasError)
 // The banner only appears once a submit has been attempted.
 const showErrors = computed(() => state.validationAttempted && validation.value.hasErrors)
@@ -41,8 +42,8 @@ const bannerIssues = computed(() => {
 })
 
 const ticketValue = computed(() => {
-  const tk = event.ticketTypes.find((x) => x.id === state.ticketTypeId)
-  return tk ? `${tk.name} (${formatCurrency(tk.price, { cents: false })})` : ''
+  const tk = ticketTypes.value.find((x) => x.id === state.ticketTypeId)
+  return tk ? `${tk.name} (${currency(tk.price, { cents: false })})` : ''
 })
 
 const attendeeRows = computed(() => {
@@ -63,18 +64,18 @@ const attendeeRows = computed(() => {
 })
 
 const sessionRows = computed(() =>
-  sessions
+  sessions.value
     .filter((s) => state.selectedSessionIds.includes(s.id))
-    .map((s) => ({ label: formatDayTime(s.date), value: s.title })),
+    .map((s) => ({ label: dayTime(s.date), value: s.title })),
 )
 
 const addonRows = computed(() => {
   const rows = []
   // addons.js is ordered workshops -> meals -> merchandise.
-  for (const addon of addons) {
+  for (const addon of addons.value) {
     const sel = state.addons[addon.id]
     if (!sel || sel.quantity < 1) continue
-    let value = `${addon.name} (${formatCurrency(addon.price, { cents: false })})`
+    let value = `${addon.name} (${currency(addon.price, { cents: false })})`
     if (addon.category === 'merchandise') {
       const extra = [sel.size, sel.quantity > 1 ? `×${sel.quantity}` : ''].filter(Boolean)
       if (extra.length) value += ` — ${extra.join(' ')}`
@@ -179,7 +180,7 @@ const addonRows = computed(() => {
         class="flex items-start justify-between gap-4 text-[12px] font-regular leading-[16px] text-neutral-muted"
       >
         <span>{{ $t('review.pricing.ticket', { name: summary.ticket.name }) }}</span>
-        <span>{{ formatCurrency(summary.ticket.amount) }}</span>
+        <span>{{ currency(summary.ticket.amount) }}</span>
       </div>
 
       <div
@@ -189,7 +190,7 @@ const addonRows = computed(() => {
         :class="line.kind === 'merchandise' ? 'font-medium text-brand-emphasis' : 'font-regular text-neutral-muted'"
       >
         <span>{{ line.kind === 'merchandise' ? `${line.name} × ${line.quantity}` : line.name }}</span>
-        <span>{{ formatCurrency(line.amount) }}</span>
+        <span>{{ currency(line.amount) }}</span>
       </div>
 
       <div
@@ -197,7 +198,7 @@ const addonRows = computed(() => {
         class="flex items-start justify-between gap-4 text-[11px] leading-[14px] text-brand-emphasis"
       >
         <span>{{ $t('review.pricing.workshopDiscount') }}</span>
-        <span>-{{ formatCurrency(summary.discount) }}</span>
+        <span>-{{ currency(summary.discount) }}</span>
       </div>
 
       <div class="h-px w-full bg-[var(--divider-muted)]" />
@@ -206,7 +207,7 @@ const addonRows = computed(() => {
         class="flex items-start justify-between gap-4 text-[12px] font-medium leading-[16px] text-neutral"
       >
         <span>{{ $t('review.pricing.total') }}</span>
-        <span>{{ formatCurrency(summary.total) }}</span>
+        <span>{{ currency(summary.total) }}</span>
       </div>
     </section>
   </section>

@@ -9,6 +9,10 @@ export const VIP_WORKSHOP_DISCOUNT = 0.1
 
 /**
  * Build the order summary from the wizard state.
+ *
+ * `catalog` (optional) supplies locale-aware `ticketTypes` + `addons` so the
+ * line names come out translated; it falls back to the English mock data.
+ * Prices/ids/quantities are identical across locales.
  * @returns {{
  *   ticket: { name: string, amount: number } | null,
  *   lines: { id: string, kind: 'workshop'|'meal'|'merchandise', name: string, quantity: number, amount: number }[],
@@ -16,14 +20,17 @@ export const VIP_WORKSHOP_DISCOUNT = 0.1
  *   total: number,
  * }}
  */
-export function buildOrderSummary(state) {
-  const ticket = event.ticketTypes.find((t) => t.id === state.ticketTypeId) ?? null
+export function buildOrderSummary(state, catalog = {}) {
+  const ticketTypes = catalog.ticketTypes ?? event.ticketTypes
+  const allAddons = catalog.addons ?? addons
+
+  const ticket = ticketTypes.find((t) => t.id === state.ticketTypeId) ?? null
   const isVip = state.ticketTypeId === 'vip'
 
   const lines = []
   let workshopSubtotal = 0
   // addons.js is already ordered workshops -> meals -> merchandise.
-  for (const addon of addons) {
+  for (const addon of allAddons) {
     const sel = state.addons[addon.id]
     if (!sel || sel.quantity < 1) continue
     const quantity = addon.category === 'merchandise' ? sel.quantity : 1

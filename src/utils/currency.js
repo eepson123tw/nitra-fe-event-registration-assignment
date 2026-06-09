@@ -4,10 +4,11 @@
  * @param {number} value            Amount in dollars.
  * @param {Object} [options]
  * @param {boolean} [options.cents=true]  Include cents (`$1,234.00`) vs. whole dollars (`$1,234`).
+ * @param {string} [options.locale='en-US']  BCP-47 locale for grouping/symbol (e.g. zh-TW → "US$1,234.00").
  * @returns {string} e.g. "$1,234.00" or "$299"
  */
-export function formatCurrency(value, { cents = true } = {}) {
-  return new Intl.NumberFormat('en-US', {
+export function formatCurrency(value, { cents = true, locale = 'en-US' } = {}) {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: cents ? 2 : 0,

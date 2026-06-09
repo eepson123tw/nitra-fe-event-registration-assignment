@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import { formatCurrency } from '../../../utils/currency.js'
+import { useFormat } from '../../../composables/useFormat.js'
+
+const { currency } = useFormat()
 
 defineProps({
   /** @type {{ id: string, name: string, price: number, description: string, perks: string[] }} */
@@ -33,7 +35,7 @@ defineExpose({ focus: () => root.value?.focus() })
   >
     <div class="row items-center justify-between full-width text-subtitle1 text-neutral">
       <span>{{ ticket.name }}</span>
-      <span>{{ formatCurrency(ticket.price, { cents: false }) }}</span>
+      <span>{{ currency(ticket.price, { cents: false }) }}</span>
     </div>
 
     <p class="text-sm text-neutral-muted m-0">{{ ticket.description }}</p>

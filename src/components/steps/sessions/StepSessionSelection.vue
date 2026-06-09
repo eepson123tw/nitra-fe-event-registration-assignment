@@ -3,12 +3,15 @@
 // Time-conflict detection is deferred to Step 4 (no inline blocking here);
 // only capacity-full sessions are disabled.
 import { computed, ref } from 'vue'
-import { sessions } from '../../../mocks/sessions.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
-import { dayKey, formatDayLabel, findOverlappingIds } from '../../../utils/datetime.js'
+import { useCatalog } from '../../../composables/useCatalog.js'
+import { useFormat } from '../../../composables/useFormat.js'
+import { dayKey, findOverlappingIds } from '../../../utils/datetime.js'
 import SessionCard from './SessionCard.vue'
 
 const { state } = useRegistration()
+const { sessions } = useCatalog()
+const { dayLabel } = useFormat()
 
 // Sessions that overlap another selected one — surfaced only after a submit
 // attempt (validation stays deferred), and recomputed live as the user edits
@@ -16,16 +19,16 @@ const { state } = useRegistration()
 // helper with the Step-4 validator.
 const conflictIds = computed(() => {
   if (!state.validationAttempted) return new Set()
-  const selected = sessions.filter((s) => state.selectedSessionIds.includes(s.id))
+  const selected = sessions.value.filter((s) => state.selectedSessionIds.includes(s.id))
   return findOverlappingIds(selected)
 })
 
 // Group sessions by day, preserving source order.
 const days = computed(() => {
   const map = new Map()
-  for (const s of sessions) {
+  for (const s of sessions.value) {
     const key = dayKey(s.date)
-    if (!map.has(key)) map.set(key, { key, label: formatDayLabel(s.date), sessions: [] })
+    if (!map.has(key)) map.set(key, { key, label: dayLabel(s.date), sessions: [] })
     map.get(key).sessions.push(s)
   }
   return [...map.values()]

@@ -2,8 +2,9 @@
 // A selectable workshop/meal add-on (toggle to add/remove). Workshops may be
 // disabled when sold out or when they overlap a selected session.
 import { computed } from 'vue'
-import { formatCurrency } from '../../../utils/currency.js'
-import { formatDayLabel, formatTimeRange } from '../../../utils/datetime.js'
+import { useFormat } from '../../../composables/useFormat.js'
+
+const { currency, dayLabel, timeRange } = useFormat()
 
 const props = defineProps({
   /** @type {{ id, name, price, description, date?, endDate? }} */
@@ -18,7 +19,7 @@ const emit = defineEmits(['toggle'])
 
 const timeLabel = computed(() =>
   props.addon.date
-    ? `${formatDayLabel(props.addon.date)}, ${formatTimeRange(props.addon.date, props.addon.endDate)}`
+    ? `${dayLabel(props.addon.date)}, ${timeRange(props.addon.date, props.addon.endDate)}`
     : '',
 )
 
@@ -46,7 +47,7 @@ function toggle() {
   >
     <div class="row items-center justify-between full-width text-subtitle1">
       <span class="text-neutral">{{ addon.name }}</span>
-      <span class="text-brand-emphasis">{{ formatCurrency(addon.price, { cents: false }) }}</span>
+      <span class="text-brand-emphasis">{{ currency(addon.price, { cents: false }) }}</span>
     </div>
     <p class="m-0 text-sm text-neutral-muted">{{ addon.description }}</p>
     <p v-if="timeLabel" class="m-0 text-[11px] leading-[14px] text-neutral-quiet">{{ timeLabel }}</p>

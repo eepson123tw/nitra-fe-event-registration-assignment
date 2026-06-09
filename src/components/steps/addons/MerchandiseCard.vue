@@ -2,8 +2,10 @@
 // A merchandise add-on: optional size selector + a 0..maxQuantity stepper.
 // Selected (quantity > 0) shows the brand styling and an "Added" note.
 import { computed } from 'vue'
-import { formatCurrency } from '../../../utils/currency.js'
+import { useFormat } from '../../../composables/useFormat.js'
 import QuantityPicker from '../../QuantityPicker.vue'
+
+const { currency } = useFormat()
 
 const props = defineProps({
   /** @type {{ id, name, price, description, sizes?, maxQuantity }} */
@@ -36,7 +38,7 @@ function onSize(e) {
   >
     <div class="row items-center justify-between full-width text-subtitle1 text-neutral">
       <span>{{ addon.name }}</span>
-      <span>{{ formatCurrency(addon.price, { cents: false }) }}</span>
+      <span>{{ currency(addon.price, { cents: false }) }}</span>
     </div>
     <p class="m-0 text-sm text-neutral-muted">{{ addon.description }}</p>
 

@@ -2,11 +2,16 @@
 // Live order summary: ticket + selected add-ons, VIP workshop discount, total.
 import { computed } from 'vue'
 import { useRegistration } from '../composables/useRegistration.js'
+import { useCatalog } from '../composables/useCatalog.js'
+import { useFormat } from '../composables/useFormat.js'
 import { buildOrderSummary } from '../utils/pricing.js'
-import { formatCurrency } from '../utils/currency.js'
 
 const { state } = useRegistration()
-const summary = computed(() => buildOrderSummary(state))
+const { ticketTypes, addons } = useCatalog()
+const { currency } = useFormat()
+const summary = computed(() =>
+  buildOrderSummary(state, { ticketTypes: ticketTypes.value, addons: addons.value }),
+)
 const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.length === 0)
 </script>
 
@@ -19,7 +24,7 @@ const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.leng
       class="row items-start justify-between full-width text-sm text-neutral-muted"
     >
       <span>{{ $t('addons.summary.ticket', { name: summary.ticket.name }) }}</span>
-      <span>{{ formatCurrency(summary.ticket.amount) }}</span>
+      <span>{{ currency(summary.ticket.amount) }}</span>
     </div>
 
     <div
@@ -29,7 +34,7 @@ const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.leng
       :class="line.kind === 'merchandise' ? 'font-medium text-brand-emphasis' : 'text-neutral-muted'"
     >
       <span>{{ line.kind === 'merchandise' ? `${line.name} × ${line.quantity}` : line.name }}</span>
-      <span>{{ formatCurrency(line.amount) }}</span>
+      <span>{{ currency(line.amount) }}</span>
     </div>
 
     <div
@@ -37,7 +42,7 @@ const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.leng
       class="row items-start justify-between full-width text-[11px] leading-[14px] text-brand-emphasis"
     >
       <span>{{ $t('addons.summary.workshopDiscount') }}</span>
-      <span>-{{ formatCurrency(summary.discount) }}</span>
+      <span>-{{ currency(summary.discount) }}</span>
     </div>
 
     <p v-if="isEmpty" class="m-0 text-sm text-neutral-quiet">{{ $t('addons.summary.empty') }}</p>
@@ -46,7 +51,7 @@ const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.leng
 
     <div class="row items-start justify-between full-width text-sm font-medium text-neutral">
       <span>{{ $t('addons.summary.total') }}</span>
-      <span>{{ formatCurrency(summary.total) }}</span>
+      <span>{{ currency(summary.total) }}</span>
     </div>
   </aside>
 </template>

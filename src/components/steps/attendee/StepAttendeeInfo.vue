@@ -2,14 +2,15 @@
 // Step 1 — Attendee Info: ticket type selection + attendee form.
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { event } from '../../../mocks/event.js'
 import { addons } from '../../../mocks/addons.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
+import { useCatalog } from '../../../composables/useCatalog.js'
 import TicketCard from './TicketCard.vue'
 import LabeledInput from '../../LabeledInput.vue'
 
 const { t } = useI18n()
 const { state, validation } = useRegistration()
+const { ticketTypes } = useCatalog()
 
 // Field-level errors come from the shared unified validation, but only surface
 // after a submit has been attempted — matching the spec's "no inline
@@ -19,8 +20,6 @@ function fieldError(field) {
   const f = validation.value.fields[field]
   return f ? t(f.messageKey) : ''
 }
-
-const tickets = event.ticketTypes
 
 function selectTicket(id) {
   state.ticketTypeId = id
@@ -35,7 +34,7 @@ function setCardRef(el, index) {
 // Index of the option that holds the single tab stop — the selected card, or
 // the first one when nothing is selected yet. Derived once per render.
 const activeTicketIndex = computed(() => {
-  const i = tickets.findIndex((tk) => tk.id === state.ticketTypeId)
+  const i = ticketTypes.value.findIndex((tk) => tk.id === state.ticketTypeId)
   return i === -1 ? 0 : i
 })
 function onTicketKeydown(e) {
@@ -43,8 +42,9 @@ function onTicketKeydown(e) {
   const backward = e.key === 'ArrowLeft' || e.key === 'ArrowUp'
   if (!forward && !backward) return
   e.preventDefault()
-  const next = (activeTicketIndex.value + (forward ? 1 : -1) + tickets.length) % tickets.length
-  selectTicket(tickets[next].id)
+  const list = ticketTypes.value
+  const next = (activeTicketIndex.value + (forward ? 1 : -1) + list.length) % list.length
+  selectTicket(list[next].id)
   cardRefs.value[next]?.focus()
 }
 
@@ -73,7 +73,7 @@ const requiresShipping = computed(() =>
         @keydown="onTicketKeydown"
       >
         <TicketCard
-          v-for="(ticket, index) in tickets"
+          v-for="(ticket, index) in ticketTypes"
           :key="ticket.id"
           :ref="(el) => setCardRef(el, index)"
           :ticket="ticket"

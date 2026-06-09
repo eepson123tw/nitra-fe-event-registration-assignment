@@ -1,7 +1,9 @@
 <script setup>
 // A single selectable session (multi-select). Full sessions are disabled.
 import { computed } from 'vue'
-import { formatTimeRange } from '../../../utils/datetime.js'
+import { useFormat } from '../../../composables/useFormat.js'
+
+const { timeRange: formatTimeRange } = useFormat()
 
 const props = defineProps({
   /** @type {{ id, title, speaker, speakerTitle, track, date, endDate, capacity, registered }} */
@@ -78,7 +80,7 @@ function toggle() {
         class="rounded-full px-[5px] py-[3px] text-[11px] leading-[14px] font-medium uppercase"
         :class="full ? 'bg-gray-50 text-gray-700' : (trackBadge[session.track] || trackBadge.main)"
       >
-        {{ session.track }}
+        {{ session.trackLabel || session.track }}
       </span>
       <span
         v-if="!full"

@@ -4,8 +4,8 @@
 // when they overlap a session selected in Step 2.
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { addons } from '../../../mocks/addons.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
+import { useCatalog } from '../../../composables/useCatalog.js'
 import { hasMerchandiseSelected, workshopConflictsWithSessions } from '../../../utils/validation.js'
 import AddonCard from './AddonCard.vue'
 import MerchandiseCard from './MerchandiseCard.vue'
@@ -13,6 +13,7 @@ import OrderSummary from '../../OrderSummary.vue'
 
 const { t } = useI18n()
 const { state, validation } = useRegistration()
+const { addons } = useCatalog()
 
 // Inline "select a size" error for a specific merchandise item — sourced from
 // the shared validation (path `addons.<id>`) and gated until a submit attempt.
@@ -30,7 +31,7 @@ const activeCategory = ref('workshop')
 
 const byCategory = computed(() => {
   const map = { workshop: [], meal: [], merchandise: [] }
-  for (const a of addons) map[a.category]?.push(a)
+  for (const a of addons.value) map[a.category]?.push(a)
   return map
 })
 
