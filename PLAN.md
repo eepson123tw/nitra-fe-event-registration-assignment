@@ -22,6 +22,18 @@ I read both the assignment brief (authoritative) and `README.md` (step-level spe
 **Cross-step state — composable + `provide`/`inject`.**
 A single `useRegistration` composable owns the wizard's reactive state (attendee info, ticket type, selected session IDs, selected add-ons with size/quantity). `IndexPage.vue` provides it once; each step injects it. This keeps all form data alive across forward/backward navigation without prop-drilling, and is the pattern the brief calls out explicitly. Pinia would be overkill for a single-wizard, single-route app and isn't in the starter.
 
+The store (`src/composables/useRegistration.js`) is the only source of truth — it holds raw user input/selections; everything else (pricing, conflicts, field/validation states) is derived with `computed` and never duplicated. The "current step" is local UI state in `IndexPage`, deliberately kept out of the registration store.
+
+```mermaid
+flowchart TD
+    Index["IndexPage.vue — wizard host<br/>local UI: current step"] ==>|"provides once"| Store[("useRegistration store<br/>reactive · provide / inject · Symbol key<br/>attendee · ticketTypeId · selectedSessionIds<br/>addons · validationAttempted")]
+    Store <--> S1["Step 1 · Attendee Info<br/>ticketTypeId, attendee fields"]
+    Store <--> S2["Step 2 · Sessions<br/>selectedSessionIds"]
+    Store <--> S3["Step 3 · Add-ons<br/>addons: id → qty / size"]
+    Store <--> S4["Step 4 · Review<br/>validationAttempted"]
+    Store -. computed .-> D["Derived, never stored:<br/>buildOrderSummary · intervalsOverlap<br/>requiresShipping · shippingError · validation"]
+```
+
 **Derived state via `computed`, not `watch`.**
 Pricing totals, VIP discounts, time conflicts, capacity/availability flags, and validation results are all pure functions of the source state, so they're modeled as `computed`. `watch` is reserved for genuine side effects only. (This is a stated evaluation criterion and also simply correct here.)
 
