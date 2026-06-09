@@ -16,8 +16,8 @@ defineProps({
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
-    <label class="text-md font-medium" :class="error ? 'text-danger' : 'text-neutral'">
+  <div class="flex flex-col gap-1.5">
+    <label class="text-sm font-medium" :class="error ? 'text-danger' : 'text-neutral'">
       {{ label }}
       <span v-if="required" class="text-danger">*</span>
       <span v-else-if="labelSuffix" class="font-regular text-neutral-quiet">{{ labelSuffix }}</span>

@@ -16,7 +16,20 @@ select {
   font-family: $inter;
 }
 
-// Outlined input radius to match the design token (border-radius/m = 6px).
+// Outlined fields match the design tokens, applied globally so every Quasar
+// field is consistent: 6px radius, a 44px-tall box with 10px vertical padding
+// (horizontal keeps Quasar's outlined default of 12px).
 .q-field--outlined .q-field__control {
   border-radius: 6px;
+  min-height: 44px;
+  height: 44px;
+}
+
+.q-field--outlined .q-field__native {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  // Input text = body/lg/regular (Inter 16px / 485 / 24px).
+  font-size: var(--font-size-lg);
+  font-weight: 485;
+  line-height: var(--line-height-lg);
 }
