@@ -138,7 +138,7 @@ function onTabKeydown(e) {
               class="flex items-start gap-3 rounded-[8px] border border-solid border-info-opacity bg-info-subtle-rest p-[16px]"
             >
               <q-icon name="info" size="20px" class="shrink-0 text-blue-500" />
-              <div class="flex flex-col gap-1">
+              <div class="flex min-w-0 flex-1 flex-col gap-1">
                 <p class="m-0 text-md font-semibold text-neutral">{{ $t('addons.banner.title') }}</p>
                 <p class="m-0 text-md text-neutral">{{ $t('addons.banner.text') }}</p>
               </div>
