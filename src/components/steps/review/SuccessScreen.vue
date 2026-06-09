@@ -1,10 +1,11 @@
 <script setup>
-// Post-submission confirmation — matches the Figma "Success State" frame:
-// a green check, a green title, the confirmation number, and a short note.
-// Deliberately minimal (no order recap); "Back to Home" resets the wizard.
+// Post-submission confirmation — the Figma "Success State" frame (green check,
+// green title, confirmation number, short note) plus an order recap so the user
+// has a record of what they registered for. "Back to Home" resets the wizard.
 import { event } from '../../../mocks/event.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
 import successIcon from '../../../assets/successIcon.svg'
+import OrderSummary from '../../OrderSummary.vue'
 
 defineProps({
   /** Generated confirmation reference, e.g. "TC2025-48217". */
@@ -29,6 +30,9 @@ const { state } = useRegistration()
     <p class="m-0 max-w-[420px] text-sm font-regular text-neutral-muted">
       {{ $t('success.message', { event: event.name, email: state.attendee.email }) }}
     </p>
+
+    <!-- Order recap — reuses the design's summary card, left-aligned -->
+    <OrderSummary class="w-full max-w-[420px] text-left" />
 
     <q-btn
       unelevated
