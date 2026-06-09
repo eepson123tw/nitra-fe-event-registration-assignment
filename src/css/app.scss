@@ -83,14 +83,18 @@ select {
   opacity: 0;
 }
 
-// Accessibility: honour reduced-motion — neutralise all transitions/animations.
+// Accessibility: honour reduced-motion. Neutralise transitions + smooth scroll
+// everywhere, and decorative keyframe animations — but NOT loading spinners,
+// which are essential progress feedback and must keep spinning.
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  *:not(.q-spinner):not(.q-spinner *) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

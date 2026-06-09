@@ -12,6 +12,7 @@ export default {
       review: 'Next: Review',
     },
     submit: 'Submit Registration',
+    submitting: 'Submitting…',
   },
   steps: {
     attendee: { label: 'Attendee Info' },

@@ -89,7 +89,7 @@ async function onSubmit() {
   }
   // Simulate a backend request so Submit shows a loading state (no real API).
   submitting.value = true
-  await new Promise((resolve) => setTimeout(resolve, 700))
+  await new Promise((resolve) => setTimeout(resolve, 900))
   confirmationCode.value = `TC2025-${Math.floor(10000 + Math.random() * 90000)}`
   submitted.value = true
   submitting.value = false
@@ -170,7 +170,13 @@ function restart() {
           padding="10px 16px"
           class="rounded-[10px] text-md font-semibold transition-all duration-150 hover:-translate-y-px hover:shadow-md active:translate-y-0"
           @click="onSubmit"
-        />
+        >
+          <!-- Explicit loading content so the submitting state is obvious -->
+          <template #loading>
+            <q-spinner size="18px" class="q-mr-sm" />
+            {{ $t('nav.submitting') }}
+          </template>
+        </q-btn>
       </div>
       </footer>
       </div>

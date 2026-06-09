@@ -12,6 +12,7 @@ export default {
       review: '下一步:確認',
     },
     submit: '送出報名',
+    submitting: '送出中…',
   },
   steps: {
     attendee: { label: '報名資料' },
