@@ -22,7 +22,7 @@ export default function () {
 
     devServer: {
       open: true,
-      port: 9001
+      port: 9000
     },
 
     framework: {

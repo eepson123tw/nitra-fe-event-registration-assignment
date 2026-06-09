@@ -18,11 +18,9 @@ Requires **Node 22.17.0** and **Yarn 4.6.0**, both enforced via `package.json` `
 
 ```bash
 yarn          # install dependencies
-yarn dev      # start the Quasar dev server (port 9001, auto-opens browser)
+yarn dev      # start the Quasar dev server (port 9000, auto-opens browser)
 yarn build    # production build
 ```
-
-Note: the README mentions port 9000, but `quasar.config.js` sets `devServer.port: 9001` — the latter is what actually runs.
 
 There is **no lint or test tooling configured** — no test runner, no ESLint config, and no corresponding scripts. (Vitest appears only as mock session/workshop content, not as a real dependency.) Don't assume `yarn test`/`yarn lint` exist.
 
