@@ -8,6 +8,7 @@ import { addons } from '../../../mocks/addons.js'
 import { sessions } from '../../../mocks/sessions.js'
 import { useRegistration } from '../../../composables/useRegistration.js'
 import { intervalsOverlap } from '../../../utils/datetime.js'
+import { hasMerchandiseSelected } from '../../../utils/validation.js'
 import AddonCard from './AddonCard.vue'
 import MerchandiseCard from './MerchandiseCard.vue'
 import OrderSummary from '../../OrderSummary.vue'
@@ -72,7 +73,8 @@ function updateMerch(id, { quantity, size }) {
   else delete state.addons[id]
 }
 
-const anyMerchSelected = computed(() => byCategory.value.merchandise.some((a) => isSelected(a.id)))
+// Shared with the validator so the banner and the shipping-required rule agree.
+const anyMerchSelected = computed(() => hasMerchandiseSelected(state))
 
 // Category tabs: roving tabindex + arrow-key navigation.
 const tabRefs = ref([])

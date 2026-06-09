@@ -13,7 +13,7 @@ import SuccessScreen from '../components/steps/review/SuccessScreen.vue'
 const { t } = useI18n()
 
 // Create + provide the shared wizard state for all steps.
-const { state, validation, validateAll } = provideRegistration()
+const { state, validation, validateAll, resetValidation } = provideRegistration()
 
 // Step registry: order drives the stepper, the rendered component, and the
 // "next" button label. `nextLabel` is null on the final step (shows submit).
@@ -88,6 +88,7 @@ function restart() {
   state.selectedSessionIds = []
   state.addons = {}
   state.validationAttempted = false
+  resetValidation()
   submitted.value = false
   confirmationCode.value = ''
   current.value = 1

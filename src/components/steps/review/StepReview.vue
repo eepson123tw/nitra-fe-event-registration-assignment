@@ -31,7 +31,7 @@ const bannerIssues = computed(() => {
   const seen = new Set()
   const out = []
   for (const i of validation.value.issues) {
-    const text = t(i.messageKey, i.params ?? {})
+    const text = t(i.messageKey)
     const key = `${i.step}|${text}`
     if (seen.has(key)) continue
     seen.add(key)

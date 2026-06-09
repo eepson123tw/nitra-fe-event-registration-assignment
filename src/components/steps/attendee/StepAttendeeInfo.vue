@@ -17,7 +17,7 @@ const { state, validation } = useRegistration()
 function fieldError(field) {
   if (!state.validationAttempted) return ''
   const f = validation.value.fields[field]
-  return f ? t(f.messageKey, f.params ?? {}) : ''
+  return f ? t(f.messageKey) : ''
 }
 
 const tickets = event.ticketTypes

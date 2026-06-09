@@ -24,17 +24,10 @@ export function formatTimeRange(startISO, endISO) {
   return `${timeFormat.format(new Date(startISO))} – ${timeFormat.format(new Date(endISO))}`
 }
 
-const dayTimeFormat = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: '2-digit',
-  timeZone: TZ,
-})
-
 /** Combined day + start time for review rows, e.g. "Nov 15, 9:00 AM". */
 export function formatDayTime(iso) {
-  return dayTimeFormat.format(new Date(iso)).replace(' at ', ', ')
+  const d = new Date(iso)
+  return `${dayLabelFormat.format(d)}, ${timeFormat.format(d)}`
 }
 
 /** Stable day grouping key, e.g. "2028-11-15" (the UTC date part). */
