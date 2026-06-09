@@ -66,6 +66,8 @@ A couple of places where the design source contradicts itself; in each I impleme
 
 3. **The success screen has no summary in the design, but the spec asks for one.** The Figma "Success State" frame shows only the confirmation (check, green title, confirmation number, short note) — no order recap — yet the *review* page does have a pricing summary, and the README explicitly asks for "a confirmation screen **with a summary**." Rather than silently pick one over the other, I followed the spec and placed the design's own order-summary card on the success screen (centred, left-aligned), so the user keeps a record of what they registered for, styled consistently with the rest of the app and without inventing a new visual. (Noted because it's a deliberate deviation from that specific Figma frame.)
 
+4. **The Figma says "2025"; the brief + data say "2028".** The Figma frames label the event "WebDev Summit 2025" (and the success-state mock even references "TechConf 2025"), but the assignment brief and `mocks/event.js` both name it **"WebDev Summit 2028"**. I treated the data as the source of truth: the event name is rendered from `event.name` (data-driven, never hardcoded), so the header reads "WebDev Summit 2028" and stays correct if the data changes — rather than reproducing the mockup's stale year. Same reasoning for the confirmation copy (it interpolates the real `event.name`, not "TechConf 2025").
+
 ## 3. Dependency choices
 
 Added runtime dependencies: **vue-i18n**, and **vee-validate** + **@vee-validate/zod** + **zod** for validation.
