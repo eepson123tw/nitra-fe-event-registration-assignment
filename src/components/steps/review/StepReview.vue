@@ -11,6 +11,7 @@ import { useFormat } from '../../../composables/useFormat.js'
 import { hasMerchandiseSelected } from '../../../utils/validation.js'
 import { buildOrderSummary } from '../../../utils/pricing.js'
 import ReviewSection from './ReviewSection.vue'
+import OrderSummaryLines from '../../OrderSummaryLines.vue'
 
 const { t } = useI18n()
 const { state, validation } = useRegistration()
@@ -176,41 +177,7 @@ const addonRows = computed(() => {
       class="flex flex-col gap-2 rounded-[6px] border border-solid border-neutral-muted bg-surface-l1 p-5"
     >
       <h3 class="m-0 text-subtitle1 text-neutral">{{ $t('review.pricing.title') }}</h3>
-
-      <div
-        v-if="summary.ticket"
-        class="flex items-start justify-between gap-4 text-[12px] font-regular leading-[16px] text-neutral-muted"
-      >
-        <span>{{ $t('review.pricing.ticket', { name: summary.ticket.name }) }}</span>
-        <span>{{ currency(summary.ticket.amount) }}</span>
-      </div>
-
-      <div
-        v-for="line in summary.lines"
-        :key="line.id"
-        class="flex items-start justify-between gap-4 text-[12px] leading-[16px]"
-        :class="line.kind === 'merchandise' ? 'font-medium text-brand-emphasis' : 'font-regular text-neutral-muted'"
-      >
-        <span>{{ line.kind === 'merchandise' ? `${line.name} × ${line.quantity}` : line.name }}</span>
-        <span>{{ currency(line.amount) }}</span>
-      </div>
-
-      <div
-        v-if="summary.discount > 0"
-        class="flex items-start justify-between gap-4 text-[11px] leading-[14px] text-brand-emphasis"
-      >
-        <span>{{ $t('review.pricing.workshopDiscount') }}</span>
-        <span>-{{ currency(summary.discount) }}</span>
-      </div>
-
-      <div class="divider-line" />
-
-      <div
-        class="flex items-start justify-between gap-4 text-[12px] font-medium leading-[16px] text-neutral"
-      >
-        <span>{{ $t('review.pricing.total') }}</span>
-        <span>{{ currency(summary.total) }}</span>
-      </div>
+      <OrderSummaryLines :summary="summary" :total-label="$t('review.pricing.total')" />
     </section>
   </section>
 </template>

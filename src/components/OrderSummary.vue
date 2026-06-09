@@ -1,57 +1,21 @@
 <script setup>
-// Live order summary: ticket + selected add-ons, VIP workshop discount, total.
+// Live order summary (Step 3 sidebar): card chrome + the shared summary lines.
 import { computed } from 'vue'
 import { useRegistration } from '../composables/useRegistration.js'
 import { useCatalog } from '../composables/useCatalog.js'
-import { useFormat } from '../composables/useFormat.js'
 import { buildOrderSummary } from '../utils/pricing.js'
+import OrderSummaryLines from './OrderSummaryLines.vue'
 
 const { state } = useRegistration()
 const { ticketTypes, addons } = useCatalog()
-const { currency } = useFormat()
 const summary = computed(() =>
   buildOrderSummary(state, { ticketTypes: ticketTypes.value, addons: addons.value }),
 )
-const isEmpty = computed(() => !summary.value.ticket && summary.value.lines.length === 0)
 </script>
 
 <template>
   <aside class="flex flex-col gap-4 rounded-[6px] border border-solid border-neutral-muted bg-surface-l1 p-6">
     <h2 class="m-0 text-subtitle1 text-neutral">{{ $t('addons.summary.title') }}</h2>
-
-    <div
-      v-if="summary.ticket"
-      class="row items-start justify-between full-width text-sm text-neutral-muted"
-    >
-      <span>{{ $t('addons.summary.ticket', { name: summary.ticket.name }) }}</span>
-      <span>{{ currency(summary.ticket.amount) }}</span>
-    </div>
-
-    <div
-      v-for="line in summary.lines"
-      :key="line.id"
-      class="row items-start justify-between full-width text-sm"
-      :class="line.kind === 'merchandise' ? 'font-medium text-brand-emphasis' : 'text-neutral-muted'"
-    >
-      <span>{{ line.kind === 'merchandise' ? `${line.name} × ${line.quantity}` : line.name }}</span>
-      <span>{{ currency(line.amount) }}</span>
-    </div>
-
-    <div
-      v-if="summary.discount > 0"
-      class="row items-start justify-between full-width text-[11px] leading-[14px] text-brand-emphasis"
-    >
-      <span>{{ $t('addons.summary.workshopDiscount') }}</span>
-      <span>-{{ currency(summary.discount) }}</span>
-    </div>
-
-    <p v-if="isEmpty" class="m-0 text-sm text-neutral-quiet">{{ $t('addons.summary.empty') }}</p>
-
-    <div class="divider-line" />
-
-    <div class="row items-start justify-between full-width text-sm font-medium text-neutral">
-      <span>{{ $t('addons.summary.total') }}</span>
-      <span>{{ currency(summary.total) }}</span>
-    </div>
+    <OrderSummaryLines :summary="summary" :total-label="$t('addons.summary.total')" with-empty />
   </aside>
 </template>

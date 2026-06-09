@@ -1,7 +1,6 @@
 // English (US) messages. Keys are grown per build phase.
 export default {
   app: {
-    title: 'Event Registration',
     language: 'Language',
   },
   nav: {
@@ -35,7 +34,6 @@ export default {
       label: 'Shipping Address',
       optional: '(Optional)',
       placeholder: 'Enter your shipping address',
-      required: 'Shipping address is required for merchandise orders',
     },
   },
   sessions: {
@@ -70,10 +68,7 @@ export default {
     },
     summary: {
       title: 'Order Summary',
-      ticket: '{name} Ticket',
-      workshopDiscount: 'Workshop discount (VIP 10%)',
       total: 'Total',
-      empty: 'No items selected yet.',
     },
   },
   review: {
@@ -85,7 +80,6 @@ export default {
       line: 'Step {step}: {message}',
     },
     required: '— (required)',
-    notSelected: 'Not selected',
     sections: {
       attendee: 'Attendee Information',
       sessions: 'Selected Sessions',
@@ -110,8 +104,6 @@ export default {
     },
     pricing: {
       title: 'Pricing Summary',
-      ticket: '{name} Ticket',
-      workshopDiscount: 'Workshop discount (VIP 10%)',
       total: 'Grand Total',
     },
     // Validation messages, keyed from utils/validation.js.
@@ -134,5 +126,12 @@ export default {
     confirmation: 'Confirmation #{code}',
     message: 'Thank you for registering for {event}. A confirmation email is on its way to {email}.',
     backHome: 'Back to Home',
+  },
+  // Shared order-summary line labels (used by both the Step-3 summary and the
+  // Step-4 pricing block via OrderSummaryLines).
+  summary: {
+    ticket: '{name} Ticket',
+    workshopDiscount: 'Workshop discount (VIP 10%)',
+    empty: 'No items selected yet.',
   },
 }

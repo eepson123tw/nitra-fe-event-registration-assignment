@@ -2,7 +2,6 @@
 // Proper nouns from the mock data (event/session/add-on names) stay as-is.
 export default {
   app: {
-    title: '活動報名',
     language: '語言',
   },
   nav: {
@@ -35,7 +34,6 @@ export default {
       label: '寄送地址',
       optional: '(選填)',
       placeholder: '請輸入您的寄送地址',
-      required: '購買周邊商品時需填寫寄送地址',
     },
   },
   sessions: {
@@ -70,10 +68,7 @@ export default {
     },
     summary: {
       title: '訂單摘要',
-      ticket: '{name} 票',
-      workshopDiscount: '工作坊折扣 (VIP 9 折)',
       total: '總計',
-      empty: '尚未選擇任何項目。',
     },
   },
   review: {
@@ -84,7 +79,6 @@ export default {
       line: '步驟 {step}:{message}',
     },
     required: '— (必填)',
-    notSelected: '未選擇',
     sections: {
       attendee: '報名者資料',
       sessions: '已選議程',
@@ -109,8 +103,6 @@ export default {
     },
     pricing: {
       title: '費用明細',
-      ticket: '{name} 票',
-      workshopDiscount: '工作坊折扣 (VIP 9 折)',
       total: '總計',
     },
     errors: {
@@ -132,6 +124,12 @@ export default {
     confirmation: '確認編號 #{code}',
     message: '感謝您報名 {event}。確認信將寄送至 {email}。',
     backHome: '返回首頁',
+  },
+  // 共用的訂單摘要列標籤（Step 3 摘要與 Step 4 費用明細共用,見 OrderSummaryLines）。
+  summary: {
+    ticket: '{name} 票',
+    workshopDiscount: '工作坊折扣 (VIP 9 折)',
+    empty: '尚未選擇任何項目。',
   },
   // Translations for the mock "content" (keyed by entity id). Personal names,
   // company names, the event name, and tech/brand terms are kept in English.
