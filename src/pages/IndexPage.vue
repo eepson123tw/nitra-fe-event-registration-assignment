@@ -50,11 +50,12 @@ const errorSteps = computed(() =>
     ? [1, 2, 3].filter((s) => validation.value.stepHasError[s])
     : [],
 )
-// Submit stays enabled for the first attempt (so it can reveal the errors);
-// once errors are showing, it's disabled until they're all resolved (the
-// post-attempt watch keeps validity live as the user fixes fields).
+// Submit is disabled while the (simulated) request is in flight (prevents a
+// double-submit). It stays enabled for the first attempt (so it can reveal the
+// errors); once errors are showing, it's disabled until they're all resolved
+// (the post-attempt watch keeps validity live as the user fixes fields).
 const submitDisabled = computed(
-  () => state.validationAttempted && validation.value.hasErrors,
+  () => submitting.value || (state.validationAttempted && validation.value.hasErrors),
 )
 const currentDef = computed(() => stepDefs[current.value - 1])
 const currentComponent = computed(() => currentDef.value.component)

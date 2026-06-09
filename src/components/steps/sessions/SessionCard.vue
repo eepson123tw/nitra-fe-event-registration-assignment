@@ -113,7 +113,11 @@ function toggle() {
       {{ full ? $t('sessions.soldOut') : $t('sessions.spotsLeft', { count: remaining }, remaining) }}
     </p>
 
-    <!-- Conflict cue: only after a submit attempt, on each overlapping card -->
+    <!-- Conflict cue: only after a submit attempt, on each overlapping card.
+         a11y limitation (see PLAN §6): this per-card cue is visual + readable
+         text but is NOT wired to the card's accessible name or a live region —
+         the step-level conflict notice (role="alert" in StepSessionSelection)
+         is what announces the conflict to assistive tech. -->
     <p
       v-if="conflict"
       class="row items-center no-wrap gap-1 m-0 text-[11px] leading-[14px] font-medium text-danger"

@@ -136,7 +136,7 @@ function onTabKeydown(e) {
           <div
             v-if="activeCategory === 'workshop' && hasWorkshopConflict"
             role="note"
-            class="flex items-start gap-3 rounded-[8px] border border-solid border-info-opacity bg-info-subtle-rest p-4"
+            class="flex items-start gap-3 rounded-2 border border-solid border-info-opacity bg-info-subtle-rest p-4"
           >
             <q-icon name="info" size="20px" class="shrink-0 text-blue-500" />
             <p class="m-0 min-w-0 flex-1 text-md text-neutral">{{ $t('addons.workshopConflict') }}</p>
