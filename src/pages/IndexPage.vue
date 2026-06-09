@@ -51,8 +51,11 @@ function onSubmit() {
 
 <template>
   <div class="flex flex-col min-h-screen bg-surface-l0">
-    <AppHeader />
-    <WizardStepper :steps="steps" :current="current" @navigate="goTo" />
+    <!-- Header + stepper stay pinned so the user keeps their place on long steps -->
+    <div class="sticky top-0 z-10 bg-surface-l0">
+      <AppHeader />
+      <WizardStepper :steps="steps" :current="current" @navigate="goTo" />
+    </div>
 
     <!-- Step content -->
     <main class="col-grow full-width q-px-md">
