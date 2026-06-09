@@ -100,6 +100,10 @@ The most useful thing I did was treat the agent's output as a *draft* and keep p
 - *"Why doesn't `q-py-[1.5]` change anything?"* — it's an invalid class, and a `q-btn`'s `min-height: 36px` floor swallows padding anyway; switched to Quasar's `padding` prop to hit the Figma 192×40 button.
 - *"The completed stepper line should change colour."* — this caught an earlier wrong conclusion of mine-via-Claude ("connectors are a single grey"), which had been drawn from only the Step-1 state where nothing is completed.
 
+**Multi-agent self-review — and catching the AI being wrong on *logic*, not just pixels.** Near the end I ran a panel of review agents over the whole codebase against the evaluation rubric. Most surfaced real issues I then fixed (text inputs not linked to their error message via `aria-describedby`; hardcoded `rgba()` card shadows that should be a `shadow-card` token; the stepper buttons missing `aria-current`/focus ring). But I treated the agents' output as a draft too, and two findings were wrong or overstated:
+- One agent claimed the validation `watch`'s `deep: true` was *redundant overhead*. I verified the opposite: `toFormValues()` reads `selectedSessionIds`/`addons` as **references**, so without `deep`, adding a session or changing an add-on quantity wouldn't re-trigger the live re-validation. Removing it would have silently broken Steps 2–3 error-clearing — so I kept it and documented *why*.
+- Another rated the un-clamped merchandise `maxQuantity` as a high-severity overcharge bug. I traced the data flow, confirmed the `QuantityPicker` hard-caps quantity (`:disabled="model >= max"`) with no bypass path in this app, downgraded it to defence-in-depth — then added the clamp in `pricing.js` anyway because it's cheap insurance.
+
 **What worked / what didn't.**
 
 | Worked | Didn't — needed steering |
@@ -116,6 +120,9 @@ The most useful thing I did was treat the agent's output as a *draft* and keep p
 ## 7. What I'd improve with more time
 
 - **Persist state.** A page refresh loses the in-progress registration. With more time I'd mirror the store to `sessionStorage` (or the URL) so a reload — or an accidental Edit-link round-trip — keeps the user's selections.
+- **Round out accessibility.** After the review pass, field errors are linked to inputs (`aria-describedby`), the stepper exposes `aria-current` + a per-step `aria-label` (so collapsed-on-mobile steps still announce), focus moves into each step on navigation, and every control has a focus ring. Still partial: the day/category tablists aren't fully wired to the WAI-ARIA tabs pattern (`aria-controls` / `aria-labelledby`), and the session-conflict cue isn't announced via `aria` on the card.
+- **Simulated submit loading.** There's no backend, so Submit validates + confirms synchronously; a real build would show a `loading` state on the button during the (mocked) request.
+- **De-duplicate the order summary.** `OrderSummary` (Step 3) and the Step-4 pricing block render the same `buildOrderSummary` output with parallel markup — a shared lines component would remove the drift risk (kept separate for now because the two live in different i18n namespaces and layout contexts).
 - **Responsive.** The layout degrades sensibly below 1200px and the stepper collapses its labels, but a real mobile pass (<768px touch-target sizing, denser cards) isn't fully designed or tested — the Figma only ships a 1440 frame.
 - **Tokenise a few arbitraries.** Spacing/radius now uses the numeric step scale (`p-4`, `rounded-2`); the values left in brackets are the genuinely off-scale ones — the 6px card radius (`rounded-[6px]` = the `border-radius/m` token) and small font sizes like `text-[11px]`/`text-[13px]` — which could become named tokens if the design system grows.
 - **Tests.** Out of scope per the brief, but the pricing and time-conflict logic are the parts I'd most want unit/component tests around before trusting them.
