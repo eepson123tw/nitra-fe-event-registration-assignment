@@ -25,7 +25,7 @@ const prefersReducedMotion = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
 
 // Step registry: order drives the stepper, the rendered component, and the
-// "next" button label. `nextLabel` is null on the final step (shows submit).
+// "next" button label. `nextKey` is null on the final step (shows submit).
 const stepDefs = [
   { key: 'attendee', component: StepAttendeeInfo, nextKey: 'sessions' },
   { key: 'sessions', component: StepSessionSelection, nextKey: 'addons' },
