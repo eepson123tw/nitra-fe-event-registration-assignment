@@ -49,7 +49,7 @@ const isEmpty = computed(() => !props.summary.ticket && props.summary.lines.leng
   <p v-if="withEmpty && isEmpty" class="m-0 text-sm text-neutral-quiet">{{ $t('summary.empty') }}</p>
 
   <!-- Separator before the total -->
-  <div class="h-px w-full bg-[var(--divider-muted,rgba(0,0,0,0.05))]" />
+  <div class="h-px w-full bg-[var(--divider-muted)]" />
 
   <div class="row items-start justify-between full-width text-sm font-medium text-neutral">
     <span>{{ totalLabel }}</span>
