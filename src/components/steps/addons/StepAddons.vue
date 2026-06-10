@@ -8,6 +8,7 @@ import { useRegistration } from '../../../composables/useRegistration.js'
 import { useCatalog } from '../../../composables/useCatalog.js'
 import { hasMerchandiseSelected, workshopConflictsWithSessions } from '../../../utils/validation.js'
 import TabPills from '../../TabPills.vue'
+import InfoNote from './InfoNote.vue'
 import AddonCard from './AddonCard.vue'
 import MerchandiseCard from './MerchandiseCard.vue'
 import OrderSummary from '../../OrderSummary.vue'
@@ -96,14 +97,9 @@ const anyMerchSelected = computed(() => hasMerchandiseSelected(state))
         <div role="tabpanel" class="flex flex-col gap-6">
           <!-- Reminder: a workshop overlaps a selected session (any that was
                already added has been removed from the order automatically). -->
-          <div
-            v-if="activeCategory === 'workshop' && hasWorkshopConflict"
-            role="note"
-            class="flex items-start gap-3 rounded-2 border border-solid border-info-opacity bg-info-subtle-rest p-4"
-          >
-            <q-icon name="info" size="20px" class="shrink-0 text-blue-500" />
-            <p class="m-0 min-w-0 flex-1 text-md text-neutral">{{ $t('addons.workshopConflict') }}</p>
-          </div>
+          <InfoNote v-if="activeCategory === 'workshop' && hasWorkshopConflict">
+            <p class="m-0 text-md text-neutral">{{ $t('addons.workshopConflict') }}</p>
+          </InfoNote>
 
           <!-- Workshops / Meals: selectable cards -->
           <template v-if="activeCategory !== 'merchandise'">
@@ -121,17 +117,10 @@ const anyMerchSelected = computed(() => hasMerchandiseSelected(state))
 
           <!-- Merchandise: shipping banner (once anything is added) + qty cards -->
           <template v-else>
-            <div
-              v-if="anyMerchSelected"
-              role="note"
-              class="flex items-start gap-3 rounded-2 border border-solid border-info-opacity bg-info-subtle-rest p-4"
-            >
-              <q-icon name="info" size="20px" class="shrink-0 text-blue-500" />
-              <div class="flex min-w-0 flex-1 flex-col gap-1">
-                <p class="m-0 text-md font-semibold text-neutral">{{ $t('addons.banner.title') }}</p>
-                <p class="m-0 text-md text-neutral">{{ $t('addons.banner.text') }}</p>
-              </div>
-            </div>
+            <InfoNote v-if="anyMerchSelected">
+              <p class="m-0 text-md font-semibold text-neutral">{{ $t('addons.banner.title') }}</p>
+              <p class="m-0 text-md text-neutral">{{ $t('addons.banner.text') }}</p>
+            </InfoNote>
             <MerchandiseCard
               v-for="a in byCategory.merchandise"
               :key="a.id"
