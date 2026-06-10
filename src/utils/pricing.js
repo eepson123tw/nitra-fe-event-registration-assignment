@@ -4,8 +4,9 @@
 import { event } from '../mocks/event.js'
 import { addons } from '../mocks/addons.js'
 
-/** VIP ticket holders get 10% off workshop add-ons. */
-export const VIP_WORKSHOP_DISCOUNT = 0.1
+// VIP ticket holders get 10% off workshop add-ons. The user-facing discount
+// label states the rate too (i18n `summary.workshopDiscount`) — keep them in sync.
+const VIP_WORKSHOP_DISCOUNT = 0.1
 
 /**
  * Build the order summary from the wizard state.
