@@ -15,11 +15,9 @@ import { addons } from '../mocks/addons.js'
  * changes. Ids, prices, dates, capacities are never touched here.
  *
  * @returns {{
- *   event: object,
  *   ticketTypes: import('vue').ComputedRef<object[]>,
  *   sessions: import('vue').ComputedRef<object[]>,
  *   addons: import('vue').ComputedRef<object[]>,
- *   trackLabel: (track: string) => string,
  * }}
  */
 export function useCatalog() {
@@ -55,10 +53,8 @@ export function useCatalog() {
   )
 
   return {
-    event, // name kept in English (proper noun)
     ticketTypes,
     sessions: localizedSessions,
     addons: localizedAddons,
-    trackLabel,
   }
 }
