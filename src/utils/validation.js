@@ -66,11 +66,8 @@ export const STEP_BY_FIELD = {
   addons: 3,
 }
 
-/** Stable display order for the error banner (by step, then this field order). */
-export const FIELD_ORDER = [
-  'fullName', 'email', 'phone', 'company', 'jobTitle', 'ticketType',
-  'shippingAddress', 'sessions', 'addons',
-]
+/** Stable display order for the error banner — STEP_BY_FIELD's key order is the display order. */
+export const FIELD_ORDER = Object.keys(STEP_BY_FIELD)
 
 /** Flatten the reactive store into the plain object the schema validates. */
 export function toFormValues(state) {
