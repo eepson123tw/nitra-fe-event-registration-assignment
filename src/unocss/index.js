@@ -45,6 +45,15 @@ export const layoutShortcuts = [{
   'focus-ring': 'focus-visible:shadow-[0_0_0_2px_var(--border-brand-emphasis)]',
 }]
 
+// Pill-style toggle buttons — the day/category tabs and the language switcher
+// share these states, so the styling lives once here. Sizing (padding/radius)
+// differs per use and stays at the call site.
+export const pillShortcuts = [{
+  'pill': 'cursor-pointer border-none text-[13px] transition-colors duration-150',
+  'pill-active': 'bg-brand-emphasis-rest text-inverse font-semibold hover:bg-brand-emphasis-hover',
+  'pill-inactive': 'bg-transparent text-neutral-muted font-medium hover:bg-surface-l3 hover:text-neutral',
+}]
+
 export const breakpoints = {
   tablet: '768px',
   desktop: '1024px',
@@ -74,5 +83,6 @@ export const uiExtendTheme = (theme) => ({
 export const uiShortcuts = [
   ...typographyShortcuts,
   ...layoutShortcuts,
+  ...pillShortcuts,
   ...semanticShortcuts,
 ]

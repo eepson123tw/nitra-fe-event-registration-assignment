@@ -32,10 +32,8 @@ function setLocale(code) {
       :key="l.code"
       type="button"
       :aria-pressed="locale === l.code"
-      class="cursor-pointer rounded-[6px] border-none px-3 py-1 text-[13px] transition-colors duration-150"
-      :class="locale === l.code
-        ? 'bg-brand-emphasis-rest text-inverse font-semibold hover:bg-brand-emphasis-hover'
-        : 'bg-transparent text-neutral-muted font-medium hover:bg-surface-l3 hover:text-neutral'"
+      class="pill rounded-[6px] px-3 py-1"
+      :class="locale === l.code ? 'pill-active' : 'pill-inactive'"
       @click="setLocale(l.code)"
     >
       {{ l.label }}

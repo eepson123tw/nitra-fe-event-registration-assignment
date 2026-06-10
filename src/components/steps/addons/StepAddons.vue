@@ -120,10 +120,8 @@ function onTabKeydown(e) {
             role="tab"
             :aria-selected="activeCategory === c.key"
             :tabindex="activeCategory === c.key ? 0 : -1"
-            class="cursor-pointer rounded-2 border-none px-5 py-2 text-[13px] transition-colors duration-150"
-            :class="activeCategory === c.key
-              ? 'bg-brand-emphasis-rest text-inverse font-semibold hover:bg-brand-emphasis-hover'
-              : 'bg-transparent text-neutral-muted font-medium hover:bg-surface-l3 hover:text-neutral'"
+            class="pill rounded-2 px-5 py-2"
+            :class="activeCategory === c.key ? 'pill-active' : 'pill-inactive'"
             @click="activeCategory = c.key"
           >
             {{ c.label }}

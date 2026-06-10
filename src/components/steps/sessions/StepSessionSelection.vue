@@ -85,10 +85,8 @@ function onTabKeydown(e) {
         role="tab"
         :aria-selected="day.key === activeDayKey"
         :tabindex="day.key === activeDayKey ? 0 : -1"
-        class="cursor-pointer rounded-2 border-none px-5 py-2 text-[13px] transition-colors duration-150"
-        :class="day.key === activeDayKey
-          ? 'bg-brand-emphasis-rest text-inverse font-semibold hover:bg-brand-emphasis-hover'
-          : 'bg-transparent text-neutral-muted font-medium hover:bg-surface-l3 hover:text-neutral'"
+        class="pill rounded-2 px-5 py-2"
+        :class="day.key === activeDayKey ? 'pill-active' : 'pill-inactive'"
         @click="activeDayKey = day.key"
       >
         {{ day.label }}
