@@ -1,9 +1,10 @@
 <script setup>
 // Step 1 — Attendee Info: ticket type selection + attendee form.
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRegistration } from '../../../composables/useRegistration.js'
 import { useCatalog } from '../../../composables/useCatalog.js'
+import { useRovingFocus } from '../../../composables/useRovingFocus.js'
 import { hasMerchandiseSelected } from '../../../utils/validation.js'
 import TicketCard from './TicketCard.vue'
 import LabeledInput from '../../LabeledInput.vue'
@@ -25,28 +26,19 @@ function selectTicket(id) {
   state.ticketTypeId = id
 }
 
-// Ticket cards behave as a WAI-ARIA radiogroup: one tab stop (roving
-// tabindex) and arrow keys move focus + selection between options.
-const cardRefs = ref([])
-function setCardRef(el, index) {
-  cardRefs.value[index] = el
-}
 // Index of the option that holds the single tab stop — the selected card, or
 // the first one when nothing is selected yet. Derived once per render.
 const activeTicketIndex = computed(() => {
   const i = ticketTypes.value.findIndex((tk) => tk.id === state.ticketTypeId)
   return i === -1 ? 0 : i
 })
-function onTicketKeydown(e) {
-  const forward = e.key === 'ArrowRight' || e.key === 'ArrowDown'
-  const backward = e.key === 'ArrowLeft' || e.key === 'ArrowUp'
-  if (!forward && !backward) return
-  e.preventDefault()
-  const list = ticketTypes.value
-  const next = (activeTicketIndex.value + (forward ? 1 : -1) + list.length) % list.length
-  selectTicket(list[next].id)
-  cardRefs.value[next]?.focus()
-}
+// Ticket cards behave as a WAI-ARIA radiogroup: one tab stop (roving
+// tabindex) and arrow keys move focus + selection between options.
+const { setItemRef: setCardRef, onKeydown: onTicketKeydown } = useRovingFocus(
+  () => ticketTypes.value.length,
+  () => activeTicketIndex.value,
+  (next) => selectTicket(ticketTypes.value[next].id),
+)
 
 // Selecting any merchandise add-on makes the shipping address required (shared
 // with the validator so the asterisk and the rule can't drift).
