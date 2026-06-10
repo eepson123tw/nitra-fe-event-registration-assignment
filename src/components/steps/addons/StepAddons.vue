@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { useRegistration } from '../../../composables/useRegistration.js'
 import { useCatalog } from '../../../composables/useCatalog.js'
 import { hasMerchandiseSelected, workshopConflictsWithSessions } from '../../../utils/validation.js'
+import TabPills from '../../TabPills.vue'
 import AddonCard from './AddonCard.vue'
 import MerchandiseCard from './MerchandiseCard.vue'
 import OrderSummary from '../../OrderSummary.vue'
@@ -81,22 +82,6 @@ function updateMerch(id, { quantity, size }) {
 
 // Shared with the validator so the banner and the shipping-required rule agree.
 const anyMerchSelected = computed(() => hasMerchandiseSelected(state))
-
-// Category tabs: roving tabindex + arrow-key navigation.
-const tabRefs = ref([])
-function setTabRef(el, i) {
-  tabRefs.value[i] = el
-}
-function onTabKeydown(e) {
-  const forward = e.key === 'ArrowRight' || e.key === 'ArrowDown'
-  const backward = e.key === 'ArrowLeft' || e.key === 'ArrowUp'
-  if (!forward && !backward) return
-  e.preventDefault()
-  const cur = categories.findIndex((c) => c.key === activeCategory.value)
-  const next = (cur + (forward ? 1 : -1) + categories.length) % categories.length
-  activeCategory.value = categories[next].key
-  tabRefs.value[next]?.focus()
-}
 </script>
 
 <template>
@@ -106,27 +91,7 @@ function onTabKeydown(e) {
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px]">
       <!-- Left: category tabs + the active category's add-ons -->
       <div class="flex flex-col gap-6">
-        <div
-          role="tablist"
-          :aria-label="$t('addons.sectionTitle')"
-          class="row items-center gap-1 self-start rounded-[10px] bg-surface-l2 p-1"
-          @keydown="onTabKeydown"
-        >
-          <button
-            v-for="(c, i) in categories"
-            :key="c.key"
-            :ref="(el) => setTabRef(el, i)"
-            type="button"
-            role="tab"
-            :aria-selected="activeCategory === c.key"
-            :tabindex="activeCategory === c.key ? 0 : -1"
-            class="pill rounded-2 px-5 py-2"
-            :class="activeCategory === c.key ? 'pill-active' : 'pill-inactive'"
-            @click="activeCategory = c.key"
-          >
-            {{ c.label }}
-          </button>
-        </div>
+        <TabPills v-model="activeCategory" :tabs="categories" :aria-label="$t('addons.sectionTitle')" />
 
         <div role="tabpanel" class="flex flex-col gap-6">
           <!-- Reminder: a workshop overlaps a selected session (any that was

@@ -7,6 +7,7 @@ import { useRegistration } from '../../../composables/useRegistration.js'
 import { useCatalog } from '../../../composables/useCatalog.js'
 import { useFormat } from '../../../composables/useFormat.js'
 import { dayKey, findOverlappingIds } from '../../../utils/datetime.js'
+import TabPills from '../../TabPills.vue'
 import SessionCard from './SessionCard.vue'
 
 const { state } = useRegistration()
@@ -49,21 +50,6 @@ function toggle(id) {
   else state.selectedSessionIds.splice(i, 1)
 }
 
-// Day tabs behave as a tablist: roving tabindex + arrow-key navigation.
-const tabRefs = ref([])
-function setTabRef(el, i) {
-  tabRefs.value[i] = el
-}
-function onTabKeydown(e) {
-  const forward = e.key === 'ArrowRight' || e.key === 'ArrowDown'
-  const backward = e.key === 'ArrowLeft' || e.key === 'ArrowUp'
-  if (!forward && !backward) return
-  e.preventDefault()
-  const cur = days.value.findIndex((d) => d.key === activeDayKey.value)
-  const next = (cur + (forward ? 1 : -1) + days.value.length) % days.value.length
-  activeDayKey.value = days.value[next].key
-  tabRefs.value[next]?.focus()
-}
 </script>
 
 <template>
@@ -71,27 +57,7 @@ function onTabKeydown(e) {
     <h2 class="q-my-none text-h3 font-bold text-neutral">{{ $t('sessions.sectionTitle') }}</h2>
 
     <!-- Day tabs -->
-    <div
-      role="tablist"
-      :aria-label="$t('sessions.sectionTitle')"
-      class="row items-center gap-1 self-start rounded-[10px] bg-surface-l2 p-1"
-      @keydown="onTabKeydown"
-    >
-      <button
-        v-for="(day, i) in days"
-        :key="day.key"
-        :ref="(el) => setTabRef(el, i)"
-        type="button"
-        role="tab"
-        :aria-selected="day.key === activeDayKey"
-        :tabindex="day.key === activeDayKey ? 0 : -1"
-        class="pill rounded-2 px-5 py-2"
-        :class="day.key === activeDayKey ? 'pill-active' : 'pill-inactive'"
-        @click="activeDayKey = day.key"
-      >
-        {{ day.label }}
-      </button>
-    </div>
+    <TabPills v-model="activeDayKey" :tabs="days" :aria-label="$t('sessions.sectionTitle')" />
 
     <p class="m-0 text-sm text-neutral-muted">
       {{ $t('sessions.selectedCount', { count: selectedCount }, selectedCount) }}
