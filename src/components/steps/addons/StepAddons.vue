@@ -6,6 +6,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRegistration } from '../../../composables/useRegistration.js'
 import { useCatalog } from '../../../composables/useCatalog.js'
+import { useFieldError } from '../../../composables/useFieldError.js'
 import { hasMerchandiseSelected, workshopConflictsWithSessions } from '../../../utils/validation.js'
 import TabPills from '../../TabPills.vue'
 import InfoNote from './InfoNote.vue'
@@ -14,15 +15,13 @@ import MerchandiseCard from './MerchandiseCard.vue'
 import OrderSummary from '../../OrderSummary.vue'
 
 const { t } = useI18n()
-const { state, validation } = useRegistration()
+const { state } = useRegistration()
 const { addons } = useCatalog()
 
-// Inline "select a size" error for a specific merchandise item — sourced from
-// the shared validation (path `addons.<id>`) and gated until a submit attempt.
-function sizeError(id) {
-  const f = validation.value.fields[`addons.${id}`]
-  return state.validationAttempted && f ? t(f.messageKey) : ''
-}
+// Inline "select a size" error for a specific merchandise item — the shared
+// validation files it under the nested path `addons.<id>`.
+const fieldError = useFieldError()
+const sizeError = (id) => fieldError(`addons.${id}`)
 
 const categories = [
   { key: 'workshop', label: t('addons.tabs.workshop') },

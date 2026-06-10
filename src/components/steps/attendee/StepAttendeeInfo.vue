@@ -1,26 +1,20 @@
 <script setup>
 // Step 1 — Attendee Info: ticket type selection + attendee form.
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useRegistration } from '../../../composables/useRegistration.js'
 import { useCatalog } from '../../../composables/useCatalog.js'
+import { useFieldError } from '../../../composables/useFieldError.js'
 import { useRovingFocus } from '../../../composables/useRovingFocus.js'
 import { hasMerchandiseSelected } from '../../../utils/validation.js'
 import TicketCard from './TicketCard.vue'
 import LabeledInput from '../../LabeledInput.vue'
 
-const { t } = useI18n()
-const { state, validation } = useRegistration()
+const { state } = useRegistration()
 const { ticketTypes } = useCatalog()
 
-// Field-level errors come from the shared unified validation, but only surface
-// after a submit has been attempted — matching the spec's "no inline
-// validation before Step 4". Returns a translated message, or '' when valid.
-function fieldError(field) {
-  if (!state.validationAttempted) return ''
-  const f = validation.value.fields[field]
-  return f ? t(f.messageKey) : ''
-}
+// Translated field-level errors from the shared unified validation, gated
+// until a submit attempt (no inline validation before Step 4).
+const fieldError = useFieldError()
 
 function selectTicket(id) {
   state.ticketTypeId = id
