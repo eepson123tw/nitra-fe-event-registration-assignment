@@ -34,7 +34,6 @@ import {
  * @property {RegistrationState} state
  * @property {import('vue').ComputedRef<{ issues: object[], fields: object, stepHasError: object, hasErrors: boolean }>} validation
  * @property {() => Promise<{ valid: boolean, errors: object }>} validateAll  Runs the schema over the whole store.
- * @property {() => void} resetValidation  Clears validation errors + form state.
  * @property {() => void} reset  Resets the whole store to its initial state.
  */
 
@@ -140,8 +139,8 @@ export function provideRegistration() {
     { deep: true },
   )
 
-  // Clear validation state (used when restarting the wizard) so a prior run's
-  // errors don't linger in the form/errorMap.
+  // Clear validation state (part of reset()) so a prior run's errors don't
+  // linger in the form/errorMap.
   function resetValidation() {
     errorMap.value = {}
     form.resetForm()
@@ -156,7 +155,7 @@ export function provideRegistration() {
 
   const validation = computed(() => buildValidation(errorMap.value))
   /** @type {RegistrationStore} */
-  const store = { state, validation, validateAll, resetValidation, reset }
+  const store = { state, validation, validateAll, reset }
   provide(REGISTRATION_KEY, store)
   return store
 }
